@@ -1,0 +1,137 @@
+package com.dact.pojo;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapInfo {
+	private static Map<String, String> addressmap;
+	// 设备类型
+	private static Map<String, String> typemap;
+	private static Map<String, String> hart_map;
+	private static Map<String, String> wirelessio_map;
+	private static Map<String, String> ai_map;
+	private static Map<String, String> shui_map;
+	private static Map<String, String> pi_map;
+	// 位号map
+	private static Map<String, String> weihao_map;
+	private static Map<String, Date> gateway_currentime;
+	private static Map<String, Date> wirelessio_currentime;
+	private static Map<String, Date> hart_currentime;
+	private static Map<String, Date> ai_currentime;
+	private static Map<String, Date> pi_currentime;
+	private static Map<String, Date> shui_currentime;
+
+	public static Map<String, String> getAddressmap() {
+		return addressmap;
+	}
+
+	public static void setAddressmap(Map<String, String> addressmap) {
+		MapInfo.addressmap = addressmap;
+	}
+
+	public static Map<String, String> getTypemap() {
+		return typemap;
+	}
+
+	public static void setTypemap(Map<String, String> typemap) {
+		MapInfo.typemap = typemap;
+	}
+
+	public static Map<String, String> getHart_map() {
+		return hart_map;
+	}
+
+	public static void setHart_map(Map<String, String> hart_map) {
+		MapInfo.hart_map = hart_map;
+	}
+
+	public static Map<String, String> getWirelessio_map() {
+		return wirelessio_map;
+	}
+
+	public static void setWirelessio_map(Map<String, String> wirelessio_map) {
+		MapInfo.wirelessio_map = wirelessio_map;
+	}
+
+	public static Map<String, String> getAi_map() {
+		return ai_map;
+	}
+
+	public static void setAi_map(Map<String, String> ai_map) {
+		MapInfo.ai_map = ai_map;
+	}
+
+	public static Map<String, String> getShui_map() {
+		return shui_map;
+	}
+
+	public static void setShui_map(Map<String, String> shui_map) {
+		MapInfo.shui_map = shui_map;
+	}
+
+	public static Map<String, String> getPi_map() {
+		return pi_map;
+	}
+
+	public static void setPi_map(Map<String, String> pi_map) {
+		MapInfo.pi_map = pi_map;
+	}
+
+	public static Map<String, String> getWeihao_map() {
+		return weihao_map;
+	}
+
+	public static void setWeihao_map(Map<String, String> weihao_map) {
+		MapInfo.weihao_map = weihao_map;
+	}
+
+	public static Map<String, Date> getGateway_currentime() {
+		return gateway_currentime;
+	}
+
+	public static void setGateway_currentime(Map<String, Date> gateway_currentime) {
+		MapInfo.gateway_currentime = gateway_currentime;
+	}
+
+	public static Map<String, Date> getWirelessio_currentime() {
+		return wirelessio_currentime;
+	}
+
+	public static void setWirelessio_currentime(Map<String, Date> wirelessio_currentime) {
+		MapInfo.wirelessio_currentime = wirelessio_currentime;
+	}
+
+	public static Map<String, Date> getHart_currentime() {
+		return hart_currentime;
+	}
+
+	public static void setHart_currentime(Map<String, Date> hart_currentime) {
+		MapInfo.hart_currentime = hart_currentime;
+	}
+
+	public static Map<String, Date> getAi_currentime() {
+		return ai_currentime;
+	}
+
+	public static void setAi_currentime(Map<String, Date> ai_currentime) {
+		MapInfo.ai_currentime = ai_currentime;
+	}
+
+	public static Map<String, Date> getPi_currentime() {
+		return pi_currentime;
+	}
+
+	public static void setPi_currentime(Map<String, Date> pi_currentime) {
+		MapInfo.pi_currentime = pi_currentime;
+	}
+
+	public static Map<String, Date> getShui_currentime() {
+		return shui_currentime;
+	}
+
+	public static void setShui_currentime(Map<String, Date> shui_currentime) {
+		MapInfo.shui_currentime = shui_currentime;
+	}
+
+}
