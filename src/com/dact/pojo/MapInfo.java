@@ -5,22 +5,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapInfo {
-	private static Map<String, String> addressmap;
+	private static Map<String, String> addressmap = new HashMap<String, String>();
 	// 设备类型
-	private static Map<String, String> typemap;
-	private static Map<String, String> hart_map;
-	private static Map<String, String> wirelessio_map;
-	private static Map<String, String> ai_map;
-	private static Map<String, String> shui_map;
-	private static Map<String, String> pi_map;
+	private static Map<String, String> typemap = new HashMap<String, String>();
+	private static Map<String, String> hart_map = new HashMap<String, String>();
+	private static Map<String, String> wirelessio_map = new HashMap<String, String>();
+	private static Map<String, String> ai_map = new HashMap<String, String>();
+	private static Map<String, String> shui_map = new HashMap<String, String>();
+	private static Map<String, String> pi_map = new HashMap<String, String>();
 	// 位号map
-	private static Map<String, String> weihao_map;
-	private static Map<String, Date> gateway_currentime;
-	private static Map<String, Date> wirelessio_currentime;
-	private static Map<String, Date> hart_currentime;
-	private static Map<String, Date> ai_currentime;
-	private static Map<String, Date> pi_currentime;
-	private static Map<String, Date> shui_currentime;
+	private static Map<String, String> weihao_map = new HashMap<String, String>();
+	private static Map<String, Date> gateway_currentime = new HashMap<String, Date>();
+	private static Map<String, Date> wirelessio_currentime = new HashMap<String, Date>();
+	private static Map<String, Date> hart_currentime = new HashMap<String, Date>();
+	private static Map<String, Date> ai_currentime = new HashMap<String, Date>();
+	private static Map<String, Date> pi_currentime = new HashMap<String, Date>();
+	private static Map<String, Date> shui_currentime = new HashMap<String, Date>();
 
 	public static Map<String, String> getAddressmap() {
 		return addressmap;

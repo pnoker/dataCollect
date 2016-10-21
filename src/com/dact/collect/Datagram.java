@@ -1,115 +1,119 @@
 package com.dact.collect;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.pojo.ShuiInfo;
-import com.dact.pojo.ValueInfo;
 import com.dact.util.DBtool;
 import com.dact.util.PackageProcessor;
-
-import sun.awt.SunHints.Value;
-
-
+import com.dact.util.PrintUtil;
 
 public class Datagram {
-	public Datagram(PackageProcessor p,BaseInfo base,ShuiInfo shui,ValueInfo value) {
-		value.setWia_shortaddress(p.bytesToString(2, 3));
-		System.out.println("进入到0183之后短地址是什么？：" + value.getWia_shortaddress() + " " + value.getIpaddress());
-		value.setWia_longaddress(
-				MapInfo.getAddressmap().get(value.getWia_shortaddress() + " " + value.getIpaddress()));
-		System.out.println("进入到0183之后长地址是什么？：" + value.getWia_longaddress());
-		value.setTypeofwatch(MapInfo.getTypemap().get(value.getWia_longaddress()));
-		DBtool dbtool = new DBtool();
+	public Datagram(PackageProcessor p, BaseInfo base) {
+		DBtool dBtool = new DBtool();
+		PrintUtil printUtil = new PrintUtil();
+		String wia_longaddress, wia_shortaddress, typeofwatch, networkinfo, shuiInfo, hartaddress = "";
+		String[] infoArr, eachArr;
+		int interval = 0;
+		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0;
+		Date lastime, currentime;
+
+		wia_shortaddress = p.bytesToString(2, 3);// WIA-PA网络短地址
+		wia_longaddress = MapInfo.getAddressmap().get(wia_shortaddress + " " + base.getIpaddress());// WIA-PA网络长地址，长地址在网络报文中才有，数据报文中只有短地址
+		typeofwatch = MapInfo.getTypemap().get(wia_longaddress);
+
 		if (p.bytesToString(8, 9).equals("7400")) {
 
 			if (p.bytesToString(10, 10).equals("01")) {
-				if (value.getTypeofwatch().equals("000e")) {
-					System.out.println("这条数据是水表的数据：");
-					System.out
-							.println("--------------------或许是水表的读数：--------------------" + p.bytesToFloatSmall(11, 14));
-					shui.setShuiInfo(MapInfo.getShui_map().get(value.getWia_longaddress()));
-					shui.setShuiliuliang(p.bytesToFloatSmall(11, 14));
-					 String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shui.getShuiInfo()
-							+ "',0," + shui.getShuiliuliang() + ",getdate())";
-					System.out.println(sente + "当前的ip地址是" + base.getIpaddress());
-					
-					dbtool.executeUpdate(sente);
-
-					// 更新表头值
-					sente = "update [shui_opc] set value = " + shui.getShuiliuliang()
-							+ ",reachtime = getdate() where typeserial = '" + shui.getShuiInfo() + "_bt' and tag = 0";
-					System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
-					dbtool.executeUpdate(sente);
-					// opc相关
-					if (shui.getShuiInfo().equals("sia0001")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + 42959);
-					} else if (shui.getShuiInfo().equals("sia0002")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + 44165);
-					} else if (shui.getShuiInfo().equals("sia0003")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + (float) 1696.7);
-					} else if (shui.getShuiInfo().equals("sia0004")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + 1821);
-					} else if (shui.getShuiInfo().equals("sia0005")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + (float) 357.6);
-					} else if (shui.getShuiInfo().equals("sia0006")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + 3280);
-					} else if (shui.getShuiInfo().equals("sia0007")) {
-						shui.setShuiliuliang(shui.getShuiliuliang() + 608);
+				if (typeofwatch.equals("000e")) {
+					shuiInfo = MapInfo.getShui_map().get(wia_longaddress);
+					shuiliuliang = p.bytesToFloatSmall(11, 14);
+					String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + shuiliuliang + ",getdate())";
+					printUtil.printTitle(sente);
+					try {
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
 					}
 
-					// 更新瞬时值
+					sente = "update [shui_opc] set value = " + shuiliuliang
+							+ ",reachtime = getdate() where typeserial = '" + shuiInfo + "_bt' and tag = 0";
+					printUtil.printTitle(sente);
+					try {
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
+					if (shuiInfo.equals("sia0001")) {
+						shuiliuliang += 42959;
+					} else if (shuiInfo.equals("sia0002")) {
+						shuiliuliang += 44165;
+					} else if (shuiInfo.equals("sia0003")) {
+						shuiliuliang += 1696.7;
+					} else if (shuiInfo.equals("sia0004")) {
+						shuiliuliang += 1821;
+					} else if (shuiInfo.equals("sia0005")) {
+						shuiliuliang += 357.6;
+					} else if (shuiInfo.equals("sia0006")) {
+						shuiliuliang += 3280;
+					} else if (shuiInfo.equals("sia0007")) {
+						shuiliuliang += 608;
+					}
+
 					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '"
-							+ shui.getShuiInfo() + "') ";
-					sente += "update [shui_opc] set value = (select (" + shui.getShuiliuliang()
-							+ "-table1.value)/table1.hours from table1)  where typeserial = '" + shui.getShuiInfo()
+							+ shuiInfo + "') ";
+					sente += "update [shui_opc] set value = (select (" + shuiliuliang
+							+ "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo
 							+ "_0' and tag = 0";
-					System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
-					dbtool.executeUpdate(sente);
-					// 更新累积值
-					sente = "update [shui_opc] set value = " + shui.getShuiliuliang()
-							+ ",reachtime = getdate() where typeserial = '" + shui.getShuiInfo() + "' and tag = 0";
-					System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
-					dbtool.executeUpdate(sente);
+					printUtil.printTitle(sente);
+					try {
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
+					sente = "update [shui_opc] set value = " + shuiliuliang
+							+ ",reachtime = getdate() where typeserial = '" + shuiInfo + "' and tag = 0";
+					printUtil.printTitle(sente);
+					try {
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
 
 				} else {
-
-					System.out.println("这条数据是modbus数据：");
 					int tagtouse = 0;
 					int used = 0;
 					String slaveID = null;
 					slaveID = p.bytesToString(11, 11);
 
-					value.setWia_longaddress(value.getWia_longaddress() + " " + slaveID);
-					System.out.println("当前的长地址其实并不对，有没有：" + value.getWia_longaddress());
-					value.setLastime(MapInfo.getWirelessio_currentime().get(value.getWia_longaddress()));
-					System.out.println("不应该取得不到啊：" + value.getLastime());
+					wia_longaddress = wia_longaddress + " " + slaveID;
+					lastime = MapInfo.getWirelessio_currentime().get(wia_longaddress);
 
-					if (value.getLastime() != null) {
-						value.setCurrentime(new Date());
-						value.setInterval(getIntervalSeconds(value.getLastime(), value.getCurrentime()));
-						System.out.println("modbus当前的时间间隔到底是什么" + value.getInterval());
+					if (lastime != null) {
+						currentime = new Date();
+						interval = getIntervalSeconds(lastime, currentime);
 
-						if (value.getInterval() >= 30) {
-							MapInfo.getWirelessio_currentime().put(value.getWia_longaddress(), value.getCurrentime());
-							infoArr = MapInfo.getWirelessio_map().get(value.getWia_longaddress()).split(",");
-							sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0] + "',";
+						if (interval >= 30) {
+							MapInfo.getWirelessio_currentime().put(wia_longaddress, currentime);
+							infoArr = MapInfo.getWirelessio_map().get(wia_longaddress).split(",");
+							String sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0] + "',";
 							for (int i = 2; i < infoArr.length; i++) {
 
 								eachArr = infoArr[i].split(" ");
-								System.out.println(
-										"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-												+ eachArr[3]);
 								if (eachArr[3].contains("int")) {
 									float tep_int = p.bytesToFloat(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
-									String sente = "insert into [" + infoArr[1]
+									sente = "insert into [" + infoArr[1]
 											+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',"
 											+ (i - 2) + "," + tep_int + ",getdate())";
-									System.out.println("完全进不来吗" + eachArr[3]);
-									System.out.println(sente + "当前的ip地址是" + base.getIpaddress());
-									dbtool.executeUpdate(sente);
+									printUtil.printTitle(sente);
+									try {
+										dBtool.executeUpdate(sente);
+									} catch (SQLException e) {
+										System.out.println(e.getMessage());
+									}
 								}
 								if (eachArr[3].contains("long")) {
 									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]),
@@ -120,17 +124,24 @@ public class Datagram {
 										tep_int = (long) (tep_int * 0.1);
 									} else {
 									}
-									String sente = "insert into [" + infoArr[1]
+									sente = "insert into [" + infoArr[1]
 											+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',"
 											+ (i - 2) + "," + tep_int + ",getdate())";
-									System.out.println("完全进不来吗" + eachArr[3]);
-									System.out.println(sente + "当前的ip地址是" + base.getIpaddress());
-									dbtool.executeUpdate(sente);
+									printUtil.printTitle(sente);
+									try {
+										dBtool.executeUpdate(sente);
+									} catch (SQLException e) {
+										System.out.println(e.getMessage());
+									}
 									sente = "update [shui_opc] set value = " + tep_int
 											+ ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_"
 											+ (i - 2) + "'";
 									System.out.println(sente);
-									dbtool.executeUpdate(sente);
+									try {
+										dBtool.executeUpdate(sente);
+									} catch (SQLException e) {
+										System.out.println(e.getMessage());
+									}
 								}
 							}
 						}
@@ -140,17 +151,20 @@ public class Datagram {
 
 			} else if (p.bytesToString(10, 10).equals("02")) {
 				System.out.println("这条数据是740002数据：");
-				if (value.getTypeofwatch().equals("000e")) {
-					System.out.println("这条数据是水表电压的数据：");
+				if (typeofwatch.equals("000e")) {
 
-					shui.setShuiInfo( MapInfo.getShui_map().get(value.getWia_longaddress()));
+					shuiInfo = MapInfo.getShui_map().get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
 					dianya = (float) dianya_tmp / 100;
 					;
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shui.getShuiInfo() + "',0,"
-							+ dianya + ",getdate())";
-					System.out.println(sente + "当前的ip地址是" + base.getIpaddress());
-					dbtool.executeUpdate(sente);
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + dianya + ",getdate())";
+					printUtil.printTitle(sente);
+					try {
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
 
 					try {
 						Thread.sleep(3000);
@@ -161,12 +175,9 @@ public class Datagram {
 				}
 
 			} else if (p.bytesToString(10, 10).equals("07")) {
-				System.out.println("开润开封协议");
-
-				System.out.println("--------------------或许是开润表的读数：--------------------" + p.bytesToFloatSmall(11, 14));
-				String runInfo = MapInfo.getShui_map().get(value.getWia_longaddress());
+				String runInfo = MapInfo.getShui_map().get(wia_longaddress);
 				if (runInfo == null) {
-					break;
+					return;
 				}
 				int tag = p.bytesToInt(12, 12);
 				float kairun = 0;
@@ -247,15 +258,23 @@ public class Datagram {
 					break;
 				}
 
-				String sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "'," + tag
-						+ "," + kairun + ",getdate())";
-				System.out.println(sente + "当前的ip地址是" + base.getIpaddress());
-				dbtool.executeUpdate(sente);
+				String sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "',"
+						+ tag + "," + kairun + ",getdate())";
+				printUtil.printTitle(sente);
+				try {
+					dBtool.executeUpdate(sente);
+				} catch (SQLException e) {
+					System.out.println(e.getMessage());
+				}
 
 				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '"
 						+ runInfo + "_" + tag + "'";
-				System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
-				dbtool.executeUpdate(sente);
+				printUtil.printTitle(sente);
+				try {
+					dBtool.executeUpdate(sente);
+				} catch (SQLException e) {
+					System.out.println(e.getMessage());
+				}
 
 			} else if (p.bytesToString(10, 10).equals("04")) {
 				System.out.println("这条数据是PI数据：");
@@ -275,12 +294,12 @@ public class Datagram {
 				i++;
 
 			}
-			value.setLastime(  MapInfo.getHart_currentime().get(value.getWia_longaddress()));
-			if (value.getLastime() != null) {
-				value.setCurrentime(new Date());
-				value.setInterval(getIntervalSeconds(value.getLastime(), value.getCurrentime()));
+			lastime = MapInfo.getHart_currentime().get(wia_longaddress);
+			if (lastime != null) {
+				currentime = new Date();
+				interval = getIntervalSeconds(lastime, currentime);
 
-				if (value.getInterval() > 10) {
+				if (interval > 10) {
 					// hart设备长地址
 					hartaddress = p.bytesToString(sure + 1, sure + 5);
 					System.out.println("hart设备长地址是：" + hartaddress);
@@ -300,47 +319,86 @@ public class Datagram {
 						System.out.println("================================");
 
 						if (infoArr[2].equals("false") && infoArr[3].equals("false")) {
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',0,'" + firstvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 
 						}
 
 						else if (infoArr[2].equals("true") && infoArr[3].equals("false")) {
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',0,'" + firstvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',2,'" + thirdvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 						}
 
 						else if (infoArr[2].equals("true") && infoArr[3].equals("true")) {
 
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
 							fourthvalue = p.bytesToFloat3(sure + 30, sure + 33);
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',0,'" + firstvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',2," + thirdvalue + ",getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
 									+ infoArr[0] + "',3,'" + fourthvalue + "',getdate())";
-							dbtool.executeUpdate(sente);
+							try {
+								dBtool.executeUpdate(sente);
+							} catch (SQLException e) {
+								System.out.println(e.getMessage());
+							}
 
 							// opc相关
 							if ((infoArr[0].equals("T1线")) || (infoArr[0].equals("T2线"))
@@ -348,33 +406,48 @@ public class Datagram {
 								sente = "update [hart01_opc] set flow1 = " + firstvalue + ",flow2 = " + secondvalue
 										+ ",flow3 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.getWeihao_map().get(infoArr[0]) + "'";
-								System.out.println(sente + "opc相关--当前的ip地址是" + ipaddress);
-								dbtool.executeUpdate(sente);
+								System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
+								try {
+									dBtool.executeUpdate(sente);
+								} catch (SQLException e) {
+									System.out.println(e.getMessage());
+								}
 							} else if ((infoArr[0].equals("焦化蜡油线")) || (infoArr[0].equals("20线"))) {
 								sente = "update [hart02_opc] set density = " + firstvalue + ",temp = " + secondvalue
 										+ ",flow = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.getWeihao_map().get(infoArr[0]) + "'";
-								System.out.println(sente + "opc相关--当前的ip地址是" + ipaddress);
-								dbtool.executeUpdate(sente);
+								System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
+								try {
+									dBtool.executeUpdate(sente);
+								} catch (SQLException e) {
+									System.out.println(e.getMessage());
+								}
 							} else if ((infoArr[0].equals("27-2线"))) {
 								sente = "update [hart03_opc] set flow1 = " + firstvalue + ",temp = " + secondvalue
 										+ ",flow2 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.getWeihao_map().get(infoArr[0]) + "'";
-								System.out.println(sente + "opc相关--当前的ip地址是" + ipaddress);
-								dbtool.executeUpdate(sente);
+								System.out.println(sente + "opc相关--当前的ip地址是" + base.getIpaddress());
+								try {
+									dBtool.executeUpdate(sente);
+								} catch (SQLException e) {
+									System.out.println(e.getMessage());
+								}
 							}
 
 						}
-						System.out.println(sente + "当前的ip地址是" + ipaddress);
 					}
 				}
 			}
 
 		}
+		try {
+			dBtool.free();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
-	public int getIntervalSeconds(Date lastime, Date currentime) {
 
-		System.out.println("为啥会是空指针呢" + lastime);
+	public int getIntervalSeconds(Date lastime, Date currentime) {
 		long sl = lastime.getTime();
 		long el = currentime.getTime();
 		long ei = el - sl;

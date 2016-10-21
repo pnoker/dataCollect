@@ -8,28 +8,16 @@ import java.util.Date;
 
 import com.dact.pojo.MapInfo;
 import com.dact.util.DBtool;
+import com.dact.util.OperateTxtUtil;
 
 public class Shui {
-	public void init_shui() {
-		DBtool dbtool = new DBtool();
-		String[] tableArr = null;
-		ArrayList<String> tmp1 = (new DataTable().init_datatable());
-		try {
-			BufferedReader bw = new BufferedReader(
-					new InputStreamReader(new FileInputStream("D:\\sia\\confiles\\shuibiao.txt"), "UTF-8"));
-			String line = null;
-			while ((line = bw.readLine()) != null) {
-				System.out.println("!!!!" + line);
-				String[] lineArr = line.split("\\t");
-				MapInfo.getShui_map().put(lineArr[0], lineArr[1]);
-				System.out.println("!!!!" + lineArr[1]);
-				Date date = new Date();
-				System.out.println(date);
-				MapInfo.getShui_currentime().put(lineArr[0], date);
-			}
-			bw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void initShui() {
+		System.out.println("<---初始化位号信息--->");
+		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
+		ArrayList<String> shuibiao = new ArrayList<String>();
+		shuibiao = operateTxtUtil.readLine("D:/sia/confiles/shuibiao.txt");
+		for (int m = 0; m < shuibiao.size(); m++) {
+			MapInfo.getShui_map().put(shuibiao.get(m).split("\\t")[0], shuibiao.get(m).split("\\t")[1]);
 		}
 	}
 }

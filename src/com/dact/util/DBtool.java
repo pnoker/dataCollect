@@ -7,71 +7,43 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBtool {
-	
 	private Connection connection = null;
 	public Statement statement = null;
 	private ResultSet result = null;
-	
-	
+
 	public DBtool() {
 		try {
-				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua;user=sa;password=yangfan";
-				connection = DriverManager.getConnection(url);
-				statement = connection.createStatement();			
-			} catch (SQLException ex) {
-				System.out.println(ex.getMessage());
-			} catch (ClassNotFoundException ex) {
-				System.out.println(ex.getMessage());
-			}
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua;user=sa;password=yangfan";
+			connection = DriverManager.getConnection(url);
+			statement = connection.createStatement();
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+		} catch (ClassNotFoundException ex) {
+			System.out.println(ex.getMessage());
+		}
 	}
-	
-	
-	
-	//oracle数据库的连接方式
-	/*
-	public DBtool() {
-		try {
-				//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				//String url = "jdbc:sqlserver://localhost:1433;databaseName=datacollect;user=sa;password=zjl";
-				//connection = DriverManager.getConnection(url);
-					
-				
-				Class.forName("oracle.jdbc.driver.OracleDriver");
-			       
-		        String url = "jdbc:oracle:" + "thin:@127.0.0.1:1521:orcl";
-		        String user = "system";
-		        String password = "manager";
-		        connection = DriverManager.getConnection(url, user, password);
-		        statement = connection.createStatement();
-			} catch (SQLException ex) {
-				System.out.println(ex.getMessage());
-			} catch (ClassNotFoundException ex) {
-				System.out.println(ex.getMessage());
-			}
-	}*/
-	
-	
+
 	public ResultSet executeQuery(String sql) throws SQLException {
 		try {
 			result = statement.executeQuery(sql);
 		} catch (SQLException se) {
-			System.out.println("ERROR:" + se.getMessage());			
+			System.out.println("ERROR:" + se.getMessage());
 		}
 		return result;
 	}
-	
+
 	public int executeUpdate(String sql) throws SQLException {
 		int updatenum = 0;
 		try {
 			updatenum = statement.executeUpdate(sql);
 			return updatenum;
 		} catch (SQLException se) {
-			System.out.println("ERROR:" + se.getMessage());	
+			System.out.println("ERROR:" + se.getMessage());
 		}
 		return updatenum;
 	}
-	
+
 	public void free() throws SQLException {
 		try {
 			if (result != null)
@@ -84,5 +56,5 @@ public class DBtool {
 			System.out.println("ERROR:" + se.getMessage());
 		}
 	}
-	
+
 }

@@ -1,29 +1,18 @@
 package com.dact.init;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import com.dact.pojo.MapInfo;
+import com.dact.util.OperateTxtUtil;
 
 public class Weihao {
-	public void init_weihao() {
-		try {
-
-			BufferedReader bw = new BufferedReader(
-					new InputStreamReader(new FileInputStream("D:\\sia\\confiles\\weihao.txt"), "UTF-8"));
-			String line = null;
-			// 因为不知道有几行数据，所以先存入list集合中
-			while ((line = bw.readLine()) != null) {
-				System.out.println("!!!!" + line);
-				String[] lineArr = line.split("\\t");
-				System.out.println("!!!!" + lineArr.length);
-				MapInfo.getWeihao_map().put(lineArr[0], lineArr[1]);
-			}
-			bw.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void initWeihao() {
+		System.out.println("<---初始化位号信息--->");
+		OperateTxtUtil readTxtUtil = new OperateTxtUtil();
+		ArrayList<String> weihao = new ArrayList<String>();
+		weihao = readTxtUtil.readLine("D:/sia/confiles/weihao.txt");
+		for (int m = 0; m < weihao.size(); m++) {
+			MapInfo.getWeihao_map().put(weihao.get(m).split("\\t")[0], weihao.get(m).split("\\t")[1]);
 		}
 	}
 }

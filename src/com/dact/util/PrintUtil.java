@@ -1,8 +1,5 @@
 package com.dact.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class PrintUtil {
 	private DateUtil date;
 
@@ -10,10 +7,10 @@ public class PrintUtil {
 		this.date = new DateUtil();
 	}
 	public void printTitle(String title) {
-		System.out.println(date.getTime() + " --> " + title);
+		System.out.println(date.getCompleteTime() + " --> " + title);
 	}
 
-	public String printHexDatagram(byte[] b, int length) {
+	public String getHexDatagram(byte[] b, int length) {
 		StringBuffer sbuf = new StringBuffer();
 		for (int i = 0; i < length; i++) {
 			String hex = Integer.toHexString(b[i] & 0xFF);
@@ -22,7 +19,10 @@ public class PrintUtil {
 			}
 			sbuf.append(hex.toUpperCase());
 		}
-		printTitle("接收到数据报文:" + sbuf.toString());
 		return sbuf.toString();
+	}
+	public static void main(String[] args) {
+		DateUtil date=new DateUtil();
+		System.out.println(date.getCompleteTime() + "-->" + "接收到数据报文");
 	}
 }
