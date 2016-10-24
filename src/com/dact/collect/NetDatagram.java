@@ -29,12 +29,10 @@ public class NetDatagram {
 		MapInfo.getAddressmap().put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
 		MapInfo.getTypemap().put(wia_longaddress, typeofwatch);
 
-		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000"))
-				|| (wia_longaddress.equals("b120000000417a00")) || (wia_longaddress.equals("007a410000000a7d"))
+		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")) || (wia_longaddress.equals("b120000000417a00")) || (wia_longaddress.equals("007a410000000a7d"))
 				|| (wia_longaddress.equals("007a410000000ab2")) || (wia_longaddress.equals("007a410000000a91"))))
 			this.networkinfo = networkinfo + wia_longaddress + ",";
-		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "'where ipaddress = '"
-				+ base.getIpaddress() + "'";
+		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "'where ipaddress = '" + base.getIpaddress() + "'";
 		try {
 			dBtool.executeUpdate(sente);
 			dBtool.free();
