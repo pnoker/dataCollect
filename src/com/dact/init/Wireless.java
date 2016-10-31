@@ -27,7 +27,7 @@ public class Wireless {
 		for (int m = 0; m < wirelessio.size(); m++) {
 			address = wirelessio.get(m).split("\\t")[0];
 			table = wirelessio.get(m).split("\\t")[1];
-			MapInfo.getWirelessio_map().put(address, table);
+			MapInfo.wirelessio_map.put(address, table);
 			if (!datatable.contains(table.split(",")[1] + "_data")) {
 				String sente = "create table " + table.split(",")[1]
 						+ "_data (serial int identity(1,1), typeserial nvarchar(50) ,tag int ,value float ,reachtime datetime)";

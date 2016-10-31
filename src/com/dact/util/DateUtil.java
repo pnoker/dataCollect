@@ -8,35 +8,31 @@ public class DateUtil {
 	/**
 	 * @return 2016-10-21 08:33:53
 	 */
-	public String getCompleteTime() {
+	public String getCompleteTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
 		return sdf.format(date);
 	}
 
 	/**
 	 * @return 2016-10-21 08:36
 	 */
-	public String getMinuteTime() {
+	public String getMinuteTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		Date date = new Date();
 		return sdf.format(date);
 	}
 
 	/**
 	 * @return 2016-10-21
 	 */
-	public String getDayTime() {
+	public String getDayTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		Date date = new Date();
 		return sdf.format(date);
 	}
 
 	/**
 	 * @return 1477010427811
 	 */
-	public long getTimeNum() {
-		Date date = new Date();
+	public long getTimeNum(Date date) {
 		return date.getTime();
 	}
 

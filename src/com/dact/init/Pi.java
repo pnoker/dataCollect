@@ -14,10 +14,10 @@ public class Pi {
 			String line = null;
 			while ((line = bw.readLine()) != null) {
 				String[] lineArr = line.split("\\t");
-				MapInfo.getPi_map().put(lineArr[0], lineArr[1]);
+				MapInfo.pi_map.put(lineArr[0], lineArr[1]);
 				Date date = new Date();
 				System.out.println(date);
-				MapInfo.getPi_currentime().put(lineArr[0], date);
+				MapInfo.pi_currentime.put(lineArr[0], date);
 
 			}
 			bw.close();

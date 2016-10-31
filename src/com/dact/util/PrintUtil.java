@@ -1,13 +1,16 @@
 package com.dact.util;
 
+import java.util.Date;
+
 public class PrintUtil {
 	private DateUtil date;
 
-	public PrintUtil(){
+	public PrintUtil() {
 		this.date = new DateUtil();
 	}
+
 	public void printTitle(String title) {
-		System.out.println(date.getCompleteTime() + " --> " + title);
+		System.out.println(date.getCompleteTime(new Date()) + " --> " + title);
 	}
 
 	public String getHexDatagram(byte[] b, int length) {
@@ -21,8 +24,9 @@ public class PrintUtil {
 		}
 		return sbuf.toString();
 	}
+
 	public static void main(String[] args) {
-		DateUtil date=new DateUtil();
-		System.out.println(date.getCompleteTime() + "-->" + "接收到数据报文");
+		DateUtil date = new DateUtil();
+		System.out.println(date.getCompleteTime(new Date()) + "-->" + "接收到数据报文");
 	}
 }
