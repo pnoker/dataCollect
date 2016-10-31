@@ -3,6 +3,10 @@ package com.dact.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * @author Pnoker
+ * @description 时间工具类
+ */
 public class DateUtil {
 
 	/**

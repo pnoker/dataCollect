@@ -2,6 +2,10 @@ package com.dact.util;
 
 import java.util.Date;
 
+/**
+ * @author Pnoker
+ * @description 打印工具类
+ */
 public class PrintUtil {
 	private DateUtil date;
 
@@ -9,14 +13,29 @@ public class PrintUtil {
 		this.date = new DateUtil();
 	}
 
-	public void printTitle(String title) {
-		System.out.println(date.getCompleteTime(new Date()) + " --> " + title);
+	public void printDetail(String ipaddress, String detail) {
+		while (ipaddress.length() < 15) {
+			ipaddress += " ";
+		}
+		System.out.println(date.getCompleteTime(new Date()) + " " + ipaddress + " --> " + detail);
 	}
 
+	public void printMessage(String message) {
+		System.out.println("<---- " + date.getCompleteTime(new Date()) + " ----> " + message);
+	}
+
+	/**
+	 * 打印十六进制的报文，不足两位，前面补零
+	 * 
+	 * @param b
+	 * @param length
+	 * @return String
+	 */
 	public String getHexDatagram(byte[] b, int length) {
 		StringBuffer sbuf = new StringBuffer();
 		for (int i = 0; i < length; i++) {
 			String hex = Integer.toHexString(b[i] & 0xFF);
+			/* 不足两位前面补零处理 */
 			if (hex.length() == 1) {
 				hex = '0' + hex;
 			}
@@ -26,7 +45,14 @@ public class PrintUtil {
 	}
 
 	public static void main(String[] args) {
-		DateUtil date = new DateUtil();
-		System.out.println(date.getCompleteTime(new Date()) + "-->" + "接收到数据报文");
+		String i = "110.112.126.19";
+		String n = "10.112.141.212";
+		while (i.length() < 15) {
+			i += " ";
+		}
+		if (n.length() == 15)
+			System.out.println("mm");
+		System.out.println(i.length());
+		System.out.println(n.length());
 	}
 }

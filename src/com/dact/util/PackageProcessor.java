@@ -27,16 +27,17 @@ public class PackageProcessor {
 		return value;
 	}
 
+	/* 将长度为两个字节的报文，转换成整型 */
 	public int doublebytesToInt(int start, int end) {
 		int num = ((inpackage[end] << 8) & 0xFF00);
 		num |= (inpackage[start] & 0xFF);
 		return num;
 	}
 
+	/* 将一个字节（十六进制），转换成十进制的long型 */
 	public Long bytesToLong(int startbit, int endbit) {
 		long value = 0;
 		String hex = bytesToString(startbit, endbit);
-		System.out.println("WXIO-Long================" + hex);
 		value = Long.valueOf(hex, 16);
 		return value;
 	}
@@ -91,8 +92,7 @@ public class PackageProcessor {
 	public float bytesToFloatSmall(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1],
-					inpackage[startbit] };
+			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1], inpackage[startbit] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -104,8 +104,7 @@ public class PackageProcessor {
 	public float bytesToFloat3(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2],
-					inpackage[startbit + 3] };
+			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2], inpackage[startbit + 3] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -120,8 +119,7 @@ public class PackageProcessor {
 	public float bytesToFloatMiddle(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit],
-					inpackage[startbit + 1] };
+			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit], inpackage[startbit + 1] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -133,6 +131,7 @@ public class PackageProcessor {
 		return value;
 	}
 
+	/* 将报文转换成十六进制的字符串，低于两位的前面补零，大于两位的取最后面的两位 */
 	public String bytesToString(int startbit, int endbit) {
 		String result = "";
 		for (int i = startbit; i <= endbit; i++) {

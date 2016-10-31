@@ -1,12 +1,9 @@
 package com.dact.init;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 import com.dact.pojo.MapInfo;
 import com.dact.util.OperateTxtUtil;
-
 
 public class Weihao {
 	public void initWeihao() {

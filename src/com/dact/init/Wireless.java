@@ -1,14 +1,7 @@
 package com.dact.init;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.dact.pojo.MapInfo;
 import com.dact.util.DBtool;
@@ -29,8 +22,7 @@ public class Wireless {
 			table = wirelessio.get(m).split("\\t")[1];
 			MapInfo.wirelessio_map.put(address, table);
 			if (!datatable.contains(table.split(",")[1] + "_data")) {
-				String sente = "create table " + table.split(",")[1]
-						+ "_data (serial int identity(1,1), typeserial nvarchar(50) ,tag int ,value float ,reachtime datetime)";
+				String sente = "create table " + table.split(",")[1] + "_data (serial int identity(1,1), typeserial nvarchar(50) ,tag int ,value float ,reachtime datetime)";
 				try {
 					dBtool.executeUpdate(sente);
 				} catch (SQLException e) {
