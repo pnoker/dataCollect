@@ -169,9 +169,15 @@ public class PackageProcessor {
 
 	public static void main(String[] args) {
 		Map<String, Long> f = new HashMap<String, Long>();
-		f.put("001", (long) 123);
-		for (Entry<String, Long> entry : f.entrySet()) {
-			System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+//		f.put("001", (long) 123);
+//		for (Entry<String, Long> entry : f.entrySet()) {
+//			System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+//		}
+		try {
+			long l= f.get("001");
+		} catch (Exception e) {
+			System.out.println("【 Error!】HealthDatagram.excuteHealthDatagram：" + e.getMessage());
 		}
+		System.out.println("jfdl");
 	}
 }

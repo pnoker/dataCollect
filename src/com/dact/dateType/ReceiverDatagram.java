@@ -8,7 +8,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -16,7 +15,6 @@ import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
-import com.dact.util.PrintUtil;
 
 public class ReceiverDatagram implements Runnable {
 	private DatagramSocket datagramSocket;
@@ -25,7 +23,6 @@ public class ReceiverDatagram implements Runnable {
 	private byte[] buf = new byte[1024];
 	private byte[] sendCode = { (byte) 0x01, (byte) 0x0B, (byte) 0xFF, (byte) 0xFF, (byte) 0x4A, (byte) 0x9B };
 	private PackageProcessor p;
-	private PrintUtil print;
 	private BaseInfo base;
 	private String networkinfo = "";
 	private LogWrite logWrite;
@@ -39,12 +36,11 @@ public class ReceiverDatagram implements Runnable {
 			this.datagramSocket = new DatagramSocket(base.getLocalport());
 			this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(base.getIpaddress()), base.getPort());
 			this.datagramReceive = new DatagramPacket(buf, 1024);
-			this.print = new PrintUtil();
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
-			print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram。1" + e.getMessage());
+			logWrite.write("【 Error!】ReceiverDatagram。1" + e.getMessage());
 		} catch (UnknownHostException e) {
-			print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram.2" + e.getMessage());
+			logWrite.write("【 Error!】ReceiverDatagram.2" + e.getMessage());
 		}
 	}
 
@@ -63,15 +59,31 @@ public class ReceiverDatagram implements Runnable {
 		}
 	}
 
+	/**
+	 * 打印十六进制的报文，不足两位，前面补零
+	 */
+	public String getHexDatagram(byte[] b, int length) {
+		StringBuffer sbuf = new StringBuffer();
+		for (int i = 0; i < length; i++) {
+			String hex = Integer.toHexString(b[i] & 0xFF);
+			/* 不足两位前面补零处理 */
+			if (hex.length() == 1) {
+				hex = '0' + hex;
+			}
+			sbuf.append(hex.toUpperCase());
+		}
+		return sbuf.toString();
+	}
+
 	public void run() {
-		print.printDetail(base.getIpaddress(), "<----------当前网关:" + base.getIpaddress() + ",启动线程---------->");
+		logWrite.write("<----------当前网关:" + base.getIpaddress() + ",启动线程---------->");
 		NetDatagram netDatagram = new NetDatagram();
 		HealthDatagram healthDatagram = new HealthDatagram();
 		Datagram datagram = new Datagram();
 		try {
 			datagramSocket.send(datagramSend);
 		} catch (IOException e) {
-			print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram.run.1：" + e.getMessage());
+			logWrite.write("【 Error!】ReceiverDatagram.run.1：" + e.getMessage());
 		}
 		while (!restart) {
 			while (!stop) {
@@ -79,20 +91,18 @@ public class ReceiverDatagram implements Runnable {
 					datagramSocket.receive(datagramReceive);
 					byte[] receive = datagramReceive.getData();
 					p = new PackageProcessor(receive);
-					String hexDatagram = print.getHexDatagram(datagramReceive.getData(), datagramReceive.getLength());
+					String hexDatagram = getHexDatagram(datagramReceive.getData(), datagramReceive.getLength());
 					String datastart = p.bytesToString(0, 1);
 					switch (datastart) {
 					/* 0101节点加入信息 */
 					case "0101":
 						logWrite.write("网络报文:" + hexDatagram);
-						print.printDetail(base.getIpaddress(), "网络报文:" + hexDatagram);
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
 						break;
 					/* 节点测试信息 */
 					case "010f":
 						logWrite.write("健康报文:" + hexDatagram);
-						print.printDetail(base.getIpaddress(), "健康报文:" + hexDatagram);
 						if (healthDatagram.excuteHealthDatagram(p, base, logWrite)) {
 							String shortAddress = p.bytesToString(2, 3);
 							String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
@@ -103,15 +113,13 @@ public class ReceiverDatagram implements Runnable {
 					/* 节点数据信息 */
 					case "0183":
 						logWrite.write("数据报文:" + hexDatagram);
-						print.printDetail(base.getIpaddress(), "数据报文:" + hexDatagram);
 						datagram.excuteDatagram(p, base, logWrite);
 						break;
 					default:
 						logWrite.write("其他报文:" + hexDatagram);
-						print.printDetail(base.getIpaddress(), "其他报文:" + hexDatagram);
 					}
 				} catch (IOException e) {
-					print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram.run.2：" + e.getMessage());
+					logWrite.write("【 Error!】ReceiverDatagram.run.2：" + e.getMessage());
 				}
 				datagramReceive.setLength(1024);
 				/* 接收完每条报文就进行判断健康报文时间间隔是问题 */
@@ -124,12 +132,12 @@ public class ReceiverDatagram implements Runnable {
 				firstTime.clear();
 				logWrite.write("<-'-'-'-设置本次超时时间间隔为10分钟-'-'-'->");
 			} catch (IOException e) {
-				print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram.run.3：" + e.getMessage());
+				logWrite.write("【 Error!】ReceiverDatagram.run.3：" + e.getMessage());
 			}
 		}
-		print.printDetail(base.getIpaddress(), "<----------当前网关:" + base.getIpaddress() + ",关闭Socket---------->");
-		print.printDetail(base.getIpaddress(), "<----------当前网关:" + base.getIpaddress() + ",关闭LogWrite---------->");
 		datagramSocket.close();
 		logWrite.close();
+		logWrite.write("<----------当前网关:" + base.getIpaddress() + ",关闭Socket---------->");
+		logWrite.write("<----------当前网关:" + base.getIpaddress() + ",关闭LogWrite---------->");
 	}
 }

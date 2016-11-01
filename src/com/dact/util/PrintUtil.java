@@ -24,26 +24,6 @@ public class PrintUtil {
 		System.out.println("<---- " + date.getCompleteTime(new Date()) + " ----> " + message);
 	}
 
-	/**
-	 * 打印十六进制的报文，不足两位，前面补零
-	 * 
-	 * @param b
-	 * @param length
-	 * @return String
-	 */
-	public String getHexDatagram(byte[] b, int length) {
-		StringBuffer sbuf = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			String hex = Integer.toHexString(b[i] & 0xFF);
-			/* 不足两位前面补零处理 */
-			if (hex.length() == 1) {
-				hex = '0' + hex;
-			}
-			sbuf.append(hex.toUpperCase());
-		}
-		return sbuf.toString();
-	}
-
 	public static void main(String[] args) {
 		String i = "110.112.126.19";
 		String n = "10.112.141.212";

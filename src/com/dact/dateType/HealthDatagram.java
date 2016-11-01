@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import com.dact.pojo.BaseInfo;
+import com.dact.pojo.MapInfo;
 import com.dact.util.DBtool;
 import com.dact.util.DateUtil;
 import com.dact.util.LogWrite;
@@ -40,8 +41,13 @@ public class HealthDatagram {
 			}
 		} else if (shortAddress.equals("0000")) {
 			// 备用短地址，不做任何操作
-		} else {//其他短地址，即：节点的短地址
-			updata = true;
+		} else {// 其他短地址，即：节点的短地址
+			try {
+				String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
+				updata = true;
+			} catch (Exception e) {
+				logWrite.write("【 Error!】HealthDatagram.excuteHealthDatagram，MapInfo.addressmap 为：" + e.getMessage());
+			}
 		}
 		return updata;
 	}
