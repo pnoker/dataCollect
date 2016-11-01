@@ -44,6 +44,7 @@ public class HealthDatagram {
 		} else {// 其他短地址，即：节点的短地址
 			try {
 				String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
+				logWrite.write("长地址：" + longAddress+" 短地址："+shortAddress);
 				updata = true;
 			} catch (Exception e) {
 				logWrite.write("【 Error!】HealthDatagram.excuteHealthDatagram，MapInfo.addressmap 为：" + e.getMessage());

@@ -52,8 +52,8 @@ public class ReceiverDatagram implements Runnable {
 		long second = (new Date()).getTime();
 		for (Entry<String, Long> entry : firstTime.entrySet()) {
 			long interval = (second - entry.getValue()) / (1000 * 60 * 10);
+			logWrite.write("<-'-'-'-网关下节点:" + entry.getKey() + "（长地址） ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
 			if ((int) interval > 10) {
-				logWrite.write("<-'-'-'-网关下节点:" + entry.getKey() + "（长地址） ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
 				this.stop = true;
 			}
 		}
@@ -106,8 +106,10 @@ public class ReceiverDatagram implements Runnable {
 						if (healthDatagram.excuteHealthDatagram(p, base, logWrite)) {
 							String shortAddress = p.bytesToString(2, 3);
 							String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
+							Date date = new Date();
 							/* 更新该节点的最后一次健康报文到达的时间戳 */
-							firstTime.put(longAddress, (new Date()).getTime());
+							logWrite.write("更新节点（长地址："+longAddress+"）最后一次健康报文到达时间戳为:" + date.getTime());
+							firstTime.put(longAddress, date.getTime());
 						}
 						break;
 					/* 节点数据信息 */
@@ -126,7 +128,7 @@ public class ReceiverDatagram implements Runnable {
 				heartBeat();
 			}
 			try {
-				logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
+				logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）下某节点健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
 				datagramSocket.send(datagramSend);
 				this.stop = false;
 				firstTime.clear();
