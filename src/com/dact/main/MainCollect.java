@@ -2,7 +2,7 @@ package com.dact.main;
 
 import java.util.ArrayList;
 
-import com.dact.collect.ReceiverDatagram;
+import com.dact.dateType.ReceiverDatagram;
 import com.dact.init.Initial;
 import com.dact.pojo.BaseInfo;
 import com.dact.util.OperateTxtUtil;

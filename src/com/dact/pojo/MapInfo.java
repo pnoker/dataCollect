@@ -22,6 +22,9 @@ public class MapInfo {
 	public static Map<String, Date> pi_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> shui_currentime = new HashMap<String, Date>();
 
+	// 超时重连
+	public static Map<String, Long> first = new HashMap<String, Long>();
+
 	public static Map<String, String> getAddressmap() {
 		return addressmap;
 	}

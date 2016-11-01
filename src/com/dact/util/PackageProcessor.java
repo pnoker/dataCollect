@@ -3,6 +3,9 @@ package com.dact.util;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class PackageProcessor {
 	private byte[] inpackage;
@@ -165,9 +168,10 @@ public class PackageProcessor {
 	}
 
 	public static void main(String[] args) {
-		byte[] test = { (byte) 0x70, (byte) 0x91, (byte) 0x00, (byte) 0x00 };
-		PackageProcessor p = new PackageProcessor(test);
-		System.out.println();
-		System.out.println(p.bytesToTen(0, 0));
+		Map<String, Long> f = new HashMap<String, Long>();
+		f.put("001", (long) 123);
+		for (Entry<String, Long> entry : f.entrySet()) {
+			System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+		}
 	}
 }

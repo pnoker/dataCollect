@@ -1,4 +1,4 @@
-package com.dact.collect;
+package com.dact.dateType;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,8 +7,13 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.dact.pojo.BaseInfo;
+import com.dact.pojo.MapInfo;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
 import com.dact.util.PrintUtil;
@@ -23,10 +28,10 @@ public class ReceiverDatagram implements Runnable {
 	private PrintUtil print;
 	private BaseInfo base;
 	private String networkinfo = "";
-	private long first;
 	private LogWrite logWrite;
 	volatile boolean stop = false;
 	volatile boolean restart = false;
+	private Map<String, Long> firstTime = new HashMap<String, Long>();
 
 	public ReceiverDatagram(BaseInfo base) {
 		try {
@@ -35,7 +40,6 @@ public class ReceiverDatagram implements Runnable {
 			this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(base.getIpaddress()), base.getPort());
 			this.datagramReceive = new DatagramPacket(buf, 1024);
 			this.print = new PrintUtil();
-			this.first = (new Date()).getTime();
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
 			print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram。1" + e.getMessage());
@@ -50,11 +54,12 @@ public class ReceiverDatagram implements Runnable {
 	 */
 	public void heartBeat() {
 		long second = (new Date()).getTime();
-		long interval = (second - first) / (1000 * 60 * 10);
-		if ((int) interval > 10) {
-			logWrite.write("<-'-'-'-本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
-			print.printDetail(base.getIpaddress(), "<----------网关:" + base.getIpaddress() + ",本次健康报文时间间隔为" + interval + "分钟---------->");
-			this.stop = true;
+		for (Entry<String, Long> entry : firstTime.entrySet()) {
+			long interval = (second - entry.getValue()) / (1000 * 60 * 10);
+			if ((int) interval > 10) {
+				logWrite.write("<-'-'-'-网关下节点:" + entry.getKey() + "（长地址） ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
+				this.stop = true;
+			}
 		}
 	}
 
@@ -77,19 +82,25 @@ public class ReceiverDatagram implements Runnable {
 					String hexDatagram = print.getHexDatagram(datagramReceive.getData(), datagramReceive.getLength());
 					String datastart = p.bytesToString(0, 1);
 					switch (datastart) {
+					/* 0101节点加入信息 */
 					case "0101":
 						logWrite.write("网络报文:" + hexDatagram);
 						print.printDetail(base.getIpaddress(), "网络报文:" + hexDatagram);
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
 						break;
+					/* 节点测试信息 */
 					case "010f":
 						logWrite.write("健康报文:" + hexDatagram);
 						print.printDetail(base.getIpaddress(), "健康报文:" + hexDatagram);
 						if (healthDatagram.excuteHealthDatagram(p, base, logWrite)) {
-							this.first = (new Date()).getTime();
+							String shortAddress = p.bytesToString(2, 3);
+							String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
+							/* 更新该节点的最后一次健康报文到达的时间戳 */
+							firstTime.put(longAddress, (new Date()).getTime());
 						}
 						break;
+					/* 节点数据信息 */
 					case "0183":
 						logWrite.write("数据报文:" + hexDatagram);
 						print.printDetail(base.getIpaddress(), "数据报文:" + hexDatagram);
@@ -108,12 +119,10 @@ public class ReceiverDatagram implements Runnable {
 			}
 			try {
 				logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
-				print.printDetail(base.getIpaddress(), "<-'-'-'-网关（" + base.getIpaddress() + "）健康报文超时，重新发送采数命令-'-'-'->");
 				datagramSocket.send(datagramSend);
 				this.stop = false;
+				firstTime.clear();
 				logWrite.write("<-'-'-'-设置本次超时时间间隔为10分钟-'-'-'->");
-				print.printDetail(base.getIpaddress(), "设置本次超时时间间隔为10分钟");
-				this.first += 1000 * 60 * 10;
 			} catch (IOException e) {
 				print.printDetail(base.getIpaddress(), "【 Error!】ReceiverDatagram.run.3：" + e.getMessage());
 			}

@@ -1,4 +1,4 @@
-package com.dact.collect;
+package com.dact.dateType;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -14,7 +14,7 @@ public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		DBtool dBtool = new DBtool();
 		PrintUtil printUtil = new PrintUtil();
-		String wia_longaddress, wia_shortaddress, typeofwatch, networkinfo, shuiInfo, hartaddress = "";
+		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, hartaddress = "";
 		String[] infoArr, eachArr;
 		int interval = 0;
 		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0;
@@ -22,20 +22,16 @@ public class Datagram {
 
 		wia_shortaddress = p.bytesToString(2, 3);
 		wia_longaddress = MapInfo.addressmap.get(wia_shortaddress + " " + base.getIpaddress());
-		typeofwatch = MapInfo.typemap.get(wia_longaddress);
+		deviceType = MapInfo.typemap.get(wia_longaddress);
 
 		logWrite.write("长地址：" + wia_longaddress);
 		logWrite.write("短地址：" + wia_shortaddress);
-		logWrite.write("设备类型：" + typeofwatch);
-
-		printUtil.printDetail(base.getIpaddress(), "长地址：" + wia_longaddress);
-		printUtil.printDetail(base.getIpaddress(), "短地址：" + wia_shortaddress);
-		printUtil.printDetail(base.getIpaddress(), "设备类型：" + typeofwatch);
+		logWrite.write("设备类型：" + deviceType);
 
 		if (p.bytesToString(8, 9).equals("7400")) {
 
 			if (p.bytesToString(10, 10).equals("01")) {
-				if (typeofwatch.equals("000e")) {
+				if (deviceType.equals("0e00")) {
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					shuiliuliang = p.bytesToFloatSmall(11, 14);
 					logWrite.write("水表数据：" + shuiInfo + "=" + shuiliuliang);
@@ -170,7 +166,7 @@ public class Datagram {
 				}
 
 			} else if (p.bytesToString(10, 10).equals("02")) {
-				if (typeofwatch.equals("000e")) {
+				if (deviceType.equals("0e00")) {
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
 					dianya = (float) dianya_tmp / 100;
@@ -302,7 +298,6 @@ public class Datagram {
 
 		} else {
 			logWrite.write("hart数据");
-			printUtil.printDetail(base.getIpaddress(), "hart数据");
 			int i = 8;
 			int sure = 0;
 			boolean flag = true;
@@ -320,7 +315,6 @@ public class Datagram {
 				interval = getIntervalSeconds(lastime, currentime);
 
 				if (interval > 10) {
-					// hart设备长地址
 					hartaddress = p.bytesToString(sure + 1, sure + 5);
 					logWrite.write("hart设备长地址：" + hartaddress);
 					printUtil.printDetail(base.getIpaddress(), "hart设备长地址：" + hartaddress);

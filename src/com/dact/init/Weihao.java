@@ -7,7 +7,6 @@ import com.dact.util.OperateTxtUtil;
 
 public class Weihao {
 	public void initWeihao() {
-		System.out.println("<---初始化位号信息--->");
 		OperateTxtUtil readTxtUtil = new OperateTxtUtil();
 		ArrayList<String> weihao = new ArrayList<String>();
 		weihao = readTxtUtil.readLine("D:/sia/confiles/weihao.txt");

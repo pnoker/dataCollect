@@ -13,9 +13,11 @@ public class LogWrite {
 	private String path = "D:/dataCollect/log/";
 	private String fromIp;
 	private DateUtil date;
+	private PrintUtil printUtil;
 
 	public LogWrite(String ipaddress) {
 		DateUtil dateUtil = new DateUtil();
+		printUtil = new PrintUtil();
 		this.fromIp = ipaddress;
 		while (this.fromIp.length() < 15) {
 			this.fromIp += " ";
@@ -36,6 +38,7 @@ public class LogWrite {
 	public void write(String detail) {
 		try {
 			fw.write(date.getCompleteTime(new Date()) + " " + fromIp + " --> " + detail);
+			printUtil.printDetail(fromIp, detail);
 			fw.newLine();
 			fw.flush();
 		} catch (Exception e) {
