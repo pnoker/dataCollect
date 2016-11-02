@@ -37,8 +37,7 @@ public class ReceiverDatagram implements Runnable {
 		try {
 			this.base = base;
 			this.datagramSocket = new DatagramSocket(base.getLocalport());
-			this.datagramSend = new DatagramPacket(sendCode, sendCode.length,
-					InetAddress.getByName(base.getIpaddress()), base.getPort());
+			this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(base.getIpaddress()), base.getPort());
 			this.datagramReceive = new DatagramPacket(buf, 1024);
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
@@ -70,7 +69,7 @@ public class ReceiverDatagram implements Runnable {
 			public void run() {
 				long second = (new Date()).getTime();
 				for (Entry<String, Long> entry : firstTime.entrySet()) {
-					long interval = (second - entry.getValue()) / (1000 * 60 * 10);
+					long interval = (second - entry.getValue()) / (1000 * 60);
 					logWrite.write("<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
 					if ((int) interval > 10) {
 						stop = true;
@@ -147,7 +146,7 @@ public class ReceiverDatagram implements Runnable {
 				}
 				datagramReceive.setLength(1024);
 				/* 接收完每条报文就进行判断健康报文时间间隔是问题 */
-				//heartBeat();
+				// heartBeat();
 			}
 			try {
 				logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）下某节点健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
