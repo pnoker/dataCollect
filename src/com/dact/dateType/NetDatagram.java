@@ -1,6 +1,7 @@
 package com.dact.dateType;
 
 import java.sql.SQLException;
+import java.util.Map.Entry;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
@@ -40,7 +41,11 @@ public class NetDatagram {
 		PrintUtil printUtil = new PrintUtil();
 		DateUtil dateUtil = new DateUtil();
 		String wia_longaddress = "", wia_shortaddress = "", deviceType = "";
-		/* 网络报文:01 01/43 29 00 00 00 41 7A 00/11 00/0E 00/04/01/00 00/0C 00/0D 00/01/01 00/0E00/FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00/9A 6C */
+		/*
+		 * 网络报文:01 01/43 29 00 00 00 41 7A 00/11 00/0E 00/04/01/00 00/0C 00/0D
+		 * 00/01/01
+		 * 00/0E00/FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00/9A 6C
+		 */
 		wia_longaddress = p.bytesToString(2, 9);
 		wia_shortaddress = p.bytesToString(10, 11);
 
@@ -53,7 +58,15 @@ public class NetDatagram {
 		logWrite.write("邻居个数：" + neighbor);
 		logWrite.write("设备类型：" + deviceType);
 
-		MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
+		for (Entry<String, String> entry : MapInfo.addressmap.entrySet()) {
+			String longaddress = entry.getValue();
+			String shortadress = entry.getKey();
+			if (wia_longaddress.equals(longaddress)) {
+				MapInfo.addressmap.remove(entry.getKey());
+				MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
+			}
+		}
+
 		MapInfo.typemap.put(wia_longaddress, deviceType);
 
 		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")) || (wia_longaddress.equals("b120000000417a00")) || (wia_longaddress.equals("007a410000000a7d"))
