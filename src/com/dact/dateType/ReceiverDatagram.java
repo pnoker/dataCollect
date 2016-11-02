@@ -51,18 +51,6 @@ public class ReceiverDatagram implements Runnable {
 	 * 判断健康报文的时间间隔，如果该网关的当前时间减去上次更新的网关时间，算出来的时间间隔大于10分钟，就置stop为true，跳出接收数据，
 	 * 重新发送采数命令4A9B
 	 */
-	// public void heartBeat() {
-	// long second = (new Date()).getTime();
-	// for (Entry<String, Long> entry : firstTime.entrySet()) {
-	// long interval = (second - entry.getValue()) / (1000 * 60 * 10);
-	// logWrite.write("<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" +
-	// interval + "分钟-'-'-'->");
-	// if ((int) interval > 10) {
-	// this.stop = true;
-	// }
-	// }
-	// }
-
 	public void heartBeat() {
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
@@ -105,6 +93,11 @@ public class ReceiverDatagram implements Runnable {
 		} catch (IOException e) {
 			logWrite.write("【 Error!】ReceiverDatagram.run.1：" + e.getMessage());
 		}
+
+		/*
+		 * 接收完每条报文就进行判断健康报文时间间隔,这是一个线程，每分钟检测一次当前各个节点的时间间隔，如果有某个节点的时间间隔大于10分钟，
+		 * 就向网关重新发送采数命令
+		 */
 		heartBeat();
 		while (!restart) {
 			while (!stop) {
@@ -145,18 +138,16 @@ public class ReceiverDatagram implements Runnable {
 					logWrite.write("【 Error!】ReceiverDatagram.run.2：" + e.getMessage());
 				}
 				datagramReceive.setLength(1024);
-				/* 接收完每条报文就进行判断健康报文时间间隔是问题 */
-				// heartBeat();
 			}
+			logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）下某节点健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
 			try {
-				logWrite.write("<-'-'-'-网关（" + base.getIpaddress() + "）下某节点健康报文超时，重新发送采数命令:010BFFFF4A9B-'-'-'->");
 				datagramSocket.send(datagramSend);
-				this.stop = false;
-				firstTime.clear();
-				logWrite.write("<-'-'-'-设置本次超时时间间隔为10分钟-'-'-'->");
 			} catch (IOException e) {
 				logWrite.write("【 Error!】ReceiverDatagram.run.3：" + e.getMessage());
 			}
+			this.stop = false;
+			firstTime.clear();
+			logWrite.write("<-'-'-'-重新设置本次超时时间间隔为10分钟-'-'-'->");
 		}
 		datagramSocket.close();
 		logWrite.close();
