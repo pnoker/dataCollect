@@ -1,6 +1,7 @@
 package com.dact.dateType;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import com.dact.pojo.BaseInfo;
@@ -58,10 +59,12 @@ public class NetDatagram {
 		logWrite.write("邻居个数：" + neighbor);
 		logWrite.write("设备类型：" + deviceType);
 
-		for (Entry<String, String> entry : MapInfo.addressmap.entrySet()) {
+		Iterator<Entry<String, String>> iterator = MapInfo.addressmap.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<String, String> entry = iterator.next();
 			String longaddress = entry.getValue();
 			if (wia_longaddress.equals(longaddress)) {
-				MapInfo.addressmap.remove(entry.getKey());
+				iterator.remove();
 			}
 		}
 

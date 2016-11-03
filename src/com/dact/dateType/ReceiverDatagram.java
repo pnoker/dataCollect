@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,15 +60,15 @@ public class ReceiverDatagram implements Runnable {
 				for (Entry<String, Long> entry : firstTime.entrySet()) {
 					long interval = (second - entry.getValue()) / (1000 * 60);
 					logWrite.write("<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
-					if ((int) interval > 10) {
+					if (interval > 10) {
 						stop = true;
 					}
 				}
 			}
-		}, 1000 * 5, 1000 * 60);
+		}, 1000 * 10, 1000 * 60 * 2);
 	}
 
-	/**
+	/**java -jar da
 	 * 打印十六进制的报文，不足两位，前面补零
 	 */
 	public String getHexDatagram(byte[] b, int length) {
@@ -101,6 +102,17 @@ public class ReceiverDatagram implements Runnable {
 		heartBeat();
 		while (!restart) {
 			while (!stop) {
+				try {
+					datagramSocket.setSoTimeout(1000 * 60 * 5);
+				} catch (SocketException e) {
+					logWrite.write("datagramSocket.receive 堵塞超时，" + e.getMessage());
+					try {
+						logWrite.write("<-'-'-'-重新发送采数命令:010BFFFF4A9B-'-'-'->");
+						datagramSocket.send(datagramSend);
+					} catch (IOException ex) {
+						logWrite.write("【 Error!】ReceiverDatagram.run.1：" + ex.getMessage());
+					}
+				}
 				try {
 					datagramSocket.receive(datagramReceive);
 					byte[] receive = datagramReceive.getData();
@@ -145,7 +157,7 @@ public class ReceiverDatagram implements Runnable {
 			} catch (IOException e) {
 				logWrite.write("【 Error!】ReceiverDatagram.run.3：" + e.getMessage());
 			}
-			this.stop = false;
+			stop = false;
 			firstTime.clear();
 			logWrite.write("<-'-'-'-重新设置本次超时时间间隔为10分钟-'-'-'->");
 		}
