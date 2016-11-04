@@ -25,6 +25,13 @@ public class MapInfo {
 	// 超时重连
 	public static Map<String, Long> first = new HashMap<String, Long>();
 
+	// 序列号
+	public static Map<String, Integer> serial = new HashMap<String, Integer>();
+
+	// 成功率
+	public static Map<String, Integer> number = new HashMap<String, Integer>();
+	public static Map<String, Integer> base = new HashMap<String, Integer>();
+
 	public static Map<String, String> getAddressmap() {
 		return addressmap;
 	}

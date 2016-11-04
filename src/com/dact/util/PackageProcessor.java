@@ -95,7 +95,8 @@ public class PackageProcessor {
 	public float bytesToFloatSmall(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1], inpackage[startbit] };
+			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1],
+					inpackage[startbit] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -107,7 +108,8 @@ public class PackageProcessor {
 	public float bytesToFloat3(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2], inpackage[startbit + 3] };
+			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2],
+					inpackage[startbit + 3] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -122,7 +124,8 @@ public class PackageProcessor {
 	public float bytesToFloatMiddle(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit], inpackage[startbit + 1] };
+			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit],
+					inpackage[startbit + 1] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -168,16 +171,5 @@ public class PackageProcessor {
 	}
 
 	public static void main(String[] args) {
-		Map<String, Long> f = new HashMap<String, Long>();
-//		f.put("001", (long) 123);
-//		for (Entry<String, Long> entry : f.entrySet()) {
-//			System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
-//		}
-		try {
-			long l= f.get("001");
-		} catch (Exception e) {
-			System.out.println("【 Error!】HealthDatagram.excuteHealthDatagram：" + e.getMessage());
-		}
-		System.out.println("jfdl");
 	}
 }

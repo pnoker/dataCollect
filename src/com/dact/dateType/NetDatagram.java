@@ -1,8 +1,7 @@
 package com.dact.dateType;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.ArrayList;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
@@ -28,14 +27,25 @@ public class NetDatagram {
 	}
 
 	/**
+	 * 去重操作，将重复的长地址去掉
+	 */
+	public String noRepeat(String repeat) {
+		String noRepeat = "";
+		String[] repeats = repeat.split(",");
+		ArrayList<String> list = new ArrayList<String>();
+		for (int m = 0; m < repeats.length; m++) {
+			if (!list.contains(repeats[m])) {
+				list.add(repeats[m]);
+				noRepeat += repeats[m] + ",";
+			}
+		}
+		return noRepeat;
+	}
+
+	/**
 	 * 处理网络报文，01 01
 	 * 为该网关的网络报文，网络报文包含节点的长地址、短地址、标签、设备类型、数据率、上下行GraphID、邻居,网络报文携带了长地址和短地址的对应关系，
 	 * 由于数据报文只有短地址，于是只能通过网络报文提供的对应关系确定设备
-	 * 
-	 * @param p
-	 * @param base
-	 * @param networkinfo
-	 * @param logWrite
 	 */
 	public void excuteNetDatagram(PackageProcessor p, BaseInfo base, String networkinfo, LogWrite logWrite) {
 		DBtool dBtool = new DBtool();
@@ -59,24 +69,24 @@ public class NetDatagram {
 		logWrite.write("邻居个数：" + neighbor);
 		logWrite.write("设备类型：" + deviceType);
 
-		Iterator<Entry<String, String>> iterator = MapInfo.addressmap.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<String, String> entry = iterator.next();
-			String longaddress = entry.getValue();
-			if (wia_longaddress.equals(longaddress)) {
-				iterator.remove();
-			}
-		}
+		/*
+		 * Iterator<Entry<String, String>> iterator =
+		 * MapInfo.addressmap.entrySet().iterator(); while (iterator.hasNext())
+		 * { Entry<String, String> entry = iterator.next(); String longaddress =
+		 * entry.getValue(); if (wia_longaddress.equals(longaddress)) {
+		 * iterator.remove(); } }
+		 */
 
 		MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
 		MapInfo.typemap.put(wia_longaddress, deviceType);
 
-		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")) || (wia_longaddress.equals("b120000000417a00")) || (wia_longaddress.equals("007a410000000a7d"))
-				|| (wia_longaddress.equals("007a410000000ab2")) || (wia_longaddress.equals("007a410000000a91"))))
+		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")))) {
 			this.networkinfo = networkinfo + wia_longaddress + ",";
-		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '" + base.getIpaddress() + "'";
+			this.networkinfo = noRepeat(this.networkinfo);
+		}
+		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '"
+				+ base.getIpaddress() + "'";
 		logWrite.write("更新网关的网络拓扑信息为：" + this.networkinfo);
-		printUtil.printDetail(base.getIpaddress(), "更新网关的网络拓扑信息为：" + this.networkinfo);
 		try {
 			logWrite.write("执行sql：" + sente);
 			printUtil.printDetail(base.getIpaddress(), "执行sql：" + sente);
@@ -84,7 +94,6 @@ public class NetDatagram {
 			dBtool.free();
 		} catch (SQLException e) {
 			logWrite.write("【 Error!】NetDatagram.excuteNetDatagram：" + e.getMessage());
-			printUtil.printDetail(base.getIpaddress(), "【 Error!】NetDatagram.excuteNetDatagram：" + e.getMessage());
 		}
 	}
 }
