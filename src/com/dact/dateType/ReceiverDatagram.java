@@ -38,7 +38,8 @@ public class ReceiverDatagram implements Runnable {
 		try {
 			this.base = base;
 			this.datagramSocket = new DatagramSocket(base.getLocalport());
-			this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(base.getIpaddress()), base.getPort());
+			this.datagramSend = new DatagramPacket(sendCode, sendCode.length,
+					InetAddress.getByName(base.getIpaddress()), base.getPort());
 			this.datagramReceive = new DatagramPacket(buf, 1024);
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
@@ -56,11 +57,14 @@ public class ReceiverDatagram implements Runnable {
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
+				logWrite.write("<-'-'-'- 检测健康报文时间间隔 -'-'-'->");
 				long second = (new Date()).getTime();
 				for (Entry<String, Long> entry : firstTime.entrySet()) {
 					long interval = (second - entry.getValue()) / (1000 * 60);
-					logWrite.write("<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
-					if (interval > 10) {
+					if (interval >= 10) {
+						logWrite.write(
+								"<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
+						logWrite.write("<-'-'-'- 设置 stop = true -'-'-'->");
 						stop = true;
 					}
 				}
@@ -68,7 +72,7 @@ public class ReceiverDatagram implements Runnable {
 		}, 1000 * 10, 1000 * 60 * 2);
 	}
 
-	/**java -jar da
+	/**
 	 * 打印十六进制的报文，不足两位，前面补零
 	 */
 	public String getHexDatagram(byte[] b, int length) {
@@ -103,17 +107,7 @@ public class ReceiverDatagram implements Runnable {
 		while (!restart) {
 			while (!stop) {
 				try {
-					datagramSocket.setSoTimeout(1000 * 60 * 5);
-				} catch (SocketException e) {
-					logWrite.write("datagramSocket.receive 堵塞超时，" + e.getMessage());
-					try {
-						logWrite.write("<-'-'-'-重新发送采数命令:010BFFFF4A9B-'-'-'->");
-						datagramSocket.send(datagramSend);
-					} catch (IOException ex) {
-						logWrite.write("【 Error!】ReceiverDatagram.run.1：" + ex.getMessage());
-					}
-				}
-				try {
+					datagramSocket.setSoTimeout(1000 * 60 * 3);
 					datagramSocket.receive(datagramReceive);
 					byte[] receive = datagramReceive.getData();
 					p = new PackageProcessor(receive);
@@ -146,8 +140,14 @@ public class ReceiverDatagram implements Runnable {
 					default:
 						logWrite.write("其他报文:" + hexDatagram);
 					}
-				} catch (IOException e) {
-					logWrite.write("【 Error!】ReceiverDatagram.run.2：" + e.getMessage());
+				} catch (Exception e) {
+					logWrite.write("datagramSocket.receive 堵塞超时，" + e.getMessage());
+					try {
+						logWrite.write("<-'-'-'-重新发送采数命令:010BFFFF4A9B-'-'-'->");
+						datagramSocket.send(datagramSend);
+					} catch (IOException ex) {
+						logWrite.write("【 Error!】ReceiverDatagram.run.1：" + ex.getMessage());
+					}
 				}
 				datagramReceive.setLength(1024);
 			}

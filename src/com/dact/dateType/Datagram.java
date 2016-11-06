@@ -31,7 +31,7 @@ public class Datagram {
 		/* 无线IO类型,7400 */
 		if (p.bytesToString(8, 9).equals("7400")) {
 			/* modbus数据类型，01 */
-			if (p.bytesToString(10, 10).equals("01")) {
+			if (p.bytesToString(10, 10).equals("01")) { 
 				/* 水表 */
 				if (deviceType.equals("0e00")) {
 					logWrite.write("水表");
@@ -217,8 +217,9 @@ public class Datagram {
 			}
 			/* AI数据类型，02 */
 			else if (p.bytesToString(10, 10).equals("02")) {
+				logWrite.write("AI数据类型");
 				if (deviceType.equals("0e00")) {
-					logWrite.write("AI数据类型");
+					logWrite.write("设备类型为，0e00，水表");
 					int lose = 0;
 					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
@@ -250,6 +251,49 @@ public class Datagram {
 					dianya = (float) dianya_tmp / 100;
 					logWrite.write("水表电压数据：" + shuiInfo + "=" + dianya);
 
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + dianya + ",getdate())";
+					try {
+						logWrite.write("执行sql：" + sente);
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.8：" + e.getMessage());
+					}
+				} else if (deviceType.equals("0c00")) {
+					logWrite.write("设备类型为，0c00，无线表");
+					int lose = 0;
+					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
+						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
+						logWrite.write("当前序列号：" + serial);
+						lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
+					} else {
+						MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					}
+					MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					logWrite.write("截至到上一次，丢包个数为：" + lose);
+					int num = 0;
+					float rate = 0;
+					if (MapInfo.number.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
+						num = MapInfo.number.get(wia_shortaddress + " " + base.getIpaddress()) + 1;
+					} else {
+						num++;
+					}
+					MapInfo.number.put(wia_shortaddress + " " + base.getIpaddress(), num);
+					int begin = MapInfo.base.get(wia_shortaddress + " " + base.getIpaddress());
+					if (begin == serial) {
+						rate = 100;
+					} else {
+						rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
+					}
+					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
+					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
+					int dianya_tmp = p.doublebytesToInt(11, 12);
+					float tem1 = p.bytesToFloatSmall(12, 15);
+					float tem2 = p.bytesToFloatSmall(17, 20);
+					dianya = (float) dianya_tmp / 100;
+					logWrite.write("通道0数据，温度数据：" + shuiInfo + "=" + tem1);
+					logWrite.write("通道1数据，温度数据：" + shuiInfo + "=" + tem2);
 					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
 							+ "',0," + dianya + ",getdate())";
 					try {
