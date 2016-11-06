@@ -1,15 +1,19 @@
 package com.dact.main;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.dact.dateType.ReceiverDatagram;
 import com.dact.init.Initial;
 import com.dact.pojo.BaseInfo;
 import com.dact.util.OperateTxtUtil;
+import com.dact.util.RepairNumber;
 
 public class MainCollect {
 	public static void main(String[] args) {
 		System.out.println("<---初始化操作--->");
+		final RepairNumber repairNumber = new RepairNumber();
 		Initial initial = new Initial();
 		initial.init();
 
@@ -34,5 +38,19 @@ public class MainCollect {
 				System.out.println(e.getMessage());
 			}
 		}
+		System.out.println("<---开启补数程序--->");
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+
+			@Override
+			public void run() {
+				try {
+					repairNumber.repair();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		}, 1000 * 30, 1000 * 60 * 5);
+
 	}
 }

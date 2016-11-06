@@ -10,7 +10,6 @@ import com.dact.util.OperateTxtUtil;
 
 public class Wireless {
 	public void initWireless() {
-		System.out.println("<---初始化无线IO信息--->");
 		DBtool dBtool = new DBtool();
 		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
 		ArrayList<String> wirelessio = new ArrayList<String>();
