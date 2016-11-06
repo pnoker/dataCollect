@@ -1,7 +1,6 @@
 package com.dact.util;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -35,8 +34,7 @@ public class RepairNumber {
 		for (Entry<String, String> entry : config.entrySet()) {
 			String value = entry.getValue();
 			String[] temp = value.split("#");
-			sql = "select top(1) * from " + temp[0] + " where typeserial = '" + temp[1] + "' and tag = " + temp[2]
-					+ " order by reachtime desc";
+			sql = "select top(1) * from " + temp[0] + " where typeserial = '" + temp[1] + "' and tag = " + temp[2] + " order by reachtime desc";
 			ResultSet rs = dBtool.executeQuery(sql);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String time = "";
@@ -47,17 +45,37 @@ public class RepairNumber {
 				Date date = sdf.parse(time);
 				Date now = new Date();
 				long intervel = (now.getTime() - date.getTime()) / (1000 * 60);
-				logWrite.write("<--------- 本次 "+temp[1]+" 的数据时间间隔为 " + intervel + " 分钟");
+				logWrite.write("本次 " + temp[1] + " 的数据时间间隔为 " + intervel + " 分钟");
 				if (intervel >= 70) {
-					logWrite.write("<--------- 发现数据丢包了 ");
+					logWrite.write("发现数据丢包了 ");
 					date.setTime(date.getTime() + (1000 * 60 * 60));
-					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1]
-							+ "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
-					logWrite.write("<--------- 填补数据 " + val);
+					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1] + "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
+					logWrite.write("填补数据: " + temp[1] + " , " + val + ", " + sdf.format(date));
 					dBtool.executeUpdate(sql);
+					if (temp[1].contains("sia")) {
+						if (temp[1].equals("sia0001")) {
+							val += 42959;
+						} else if (temp[1].equals("sia0002")) {
+							val += 44165;
+						} else if (temp[1].equals("sia0003")) {
+							val += 1696.7;
+						} else if (temp[1].equals("sia0004")) {
+							val += 1821;
+						} else if (temp[1].equals("sia0005")) {
+							val += 357.6;
+						} else if (temp[1].equals("sia0006")) {
+							val += 3280;
+						} else if (temp[1].equals("sia0007")) {
+							val += 608;
+						}
+						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "'";
+						dBtool.executeUpdate(sql);
+					} else if (temp[1].contains("wxio")) {
+						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "_" + temp[2] + "'";
+					}
+
 				}
 			}
-			rs.close();
 		}
 		dBtool.free();
 		logWrite.write("<---------结束，检测数据丢包程序--------->");
