@@ -13,7 +13,6 @@ import com.dact.util.RepairNumber;
 public class MainCollect {
 	public static void main(String[] args) {
 		System.out.println("<---初始化操作--->");
-		final RepairNumber repairNumber = new RepairNumber();
 		Initial initial = new Initial();
 		initial.init();
 
@@ -44,6 +43,7 @@ public class MainCollect {
 
 			@Override
 			public void run() {
+				RepairNumber repairNumber = new RepairNumber();
 				try {
 					repairNumber.repair();
 				} catch (Exception e1) {

@@ -120,6 +120,10 @@ public class ReceiverDatagram implements Runnable {
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
 						break;
+					case "0111":
+						logWrite.write("节点到网关的成功率报文:"+hexDatagram);
+						
+						break;
 					/* 节点测试信息 */
 					case "010f":
 						logWrite.write("健康报文:" + hexDatagram);

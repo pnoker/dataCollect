@@ -23,6 +23,9 @@ public class RepairNumber {
 	public void repair() throws Exception {
 		logWrite.write("<---------开始，检测数据是否丢失--------->");
 		DBtool dBtool = new DBtool();
+		DBtool dBtool2 = new DBtool();
+		ResultSet rs = null;
+		ResultSet rs2 = null;
 		DateUtil dateUtil = new DateUtil();
 		Map<String, String> config = null;
 		try {
@@ -35,7 +38,7 @@ public class RepairNumber {
 			String value = entry.getValue();
 			String[] temp = value.split("#");
 			sql = "select top(1) * from " + temp[0] + " where typeserial = '" + temp[1] + "' and tag = " + temp[2] + " order by reachtime desc";
-			ResultSet rs = dBtool.executeQuery(sql);
+			rs = dBtool.executeQuery(sql);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String time = "";
 			float val;
@@ -51,7 +54,7 @@ public class RepairNumber {
 					date.setTime(date.getTime() + (1000 * 60 * 60));
 					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1] + "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
 					logWrite.write("填补数据: " + temp[1] + " , " + val + ", " + sdf.format(date));
-					dBtool.executeUpdate(sql);
+					dBtool2.executeUpdate(sql);
 					if (temp[1].contains("sia")) {
 						if (temp[1].equals("sia0001")) {
 							val += 42959;
@@ -69,14 +72,16 @@ public class RepairNumber {
 							val += 608;
 						}
 						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "'";
-						dBtool.executeUpdate(sql);
+						dBtool2.executeUpdate(sql);
 					} else if (temp[1].contains("wxio")) {
 						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "_" + temp[2] + "'";
+						dBtool2.executeUpdate(sql);
 					}
 
 				}
 			}
 		}
+		rs.close();
 		dBtool.free();
 		logWrite.write("<---------结束，检测数据丢包程序--------->");
 	}
