@@ -14,7 +14,7 @@ public class DBtool {
 	public DBtool() {
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			String url = "jdbc:sqlserver://localhost:1433;databaseName=tianjingcollect-anqing;user=sa;password=yangfan";
+			String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua;user=sa;password=yangfan";
 			connection = DriverManager.getConnection(url);
 			statement = connection.createStatement();
 		} catch (SQLException ex) {
