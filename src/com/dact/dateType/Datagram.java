@@ -84,7 +84,8 @@ public class Datagram {
 						}
 					} else {
 						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
+								+ "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -211,7 +212,8 @@ public class Datagram {
 						}
 					} else {
 						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
+								+ "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -331,7 +333,8 @@ public class Datagram {
 						}
 					} else {
 						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
+								+ "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -403,7 +406,8 @@ public class Datagram {
 						}
 					} else {
 						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+								+ ",rate = " + rate + ",reachtime = getdate()  where longaddress = '" + wia_longaddress
+								+ "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -481,7 +485,8 @@ public class Datagram {
 					}
 				} else {
 					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-							+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+							+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
+							+ "'";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
@@ -633,7 +638,8 @@ public class Datagram {
 					}
 				} else {
 					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-							+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+							+ ",rate = " + rate + ",reachtime = getdate()  where longaddress = '" + wia_longaddress
+							+ "'";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
@@ -698,7 +704,7 @@ public class Datagram {
 				}
 			} else {
 				sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
-						+ rate + " where longaddress = '" + wia_longaddress + "'";
+						+ rate + ",reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 				try {
 					logWrite.write("执行sql：" + sql);
 					dBtool.executeUpdate(sql);
