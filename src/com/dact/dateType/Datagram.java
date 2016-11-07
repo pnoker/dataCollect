@@ -61,6 +61,17 @@ public class Datagram {
 					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+					
+					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					
+					
+					
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					shuiliuliang = p.bytesToFloatSmall(11, 14);
 					logWrite.write("水表数据：" + shuiInfo + "=" + shuiliuliang);
@@ -157,6 +168,15 @@ public class Datagram {
 					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+					
+					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					
 					if (lastime != null) {
 						currentime = new Date();
 						interval = getIntervalSeconds(lastime, currentime);
@@ -246,6 +266,15 @@ public class Datagram {
 					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+					
+					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
 					dianya = (float) dianya_tmp / 100;
@@ -287,6 +316,16 @@ public class Datagram {
 					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+					
+					
+					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
 					float tem1 = p.bytesToFloatSmall(12, 15);
@@ -334,6 +373,16 @@ public class Datagram {
 				}
 				logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 				logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+				
+				
+				String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+				try {
+					logWrite.write("执行sql：" + sql);
+					dBtool.executeUpdate(sql);
+				} catch (SQLException e) {
+					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+				}
+				
 				String runInfo = MapInfo.shui_map.get(wia_longaddress);
 				if (runInfo == null) {
 
@@ -468,6 +517,16 @@ public class Datagram {
 			}
 			logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 			logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+			
+			
+			String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"+wia_longaddress+"',"+serial+",getdate()";
+			try {
+				logWrite.write("执行sql：" + sql);
+				dBtool.executeUpdate(sql);
+			} catch (SQLException e) {
+				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+			}
+			
 			int i = 8;
 			int sure = 0;
 			boolean flag = true;
