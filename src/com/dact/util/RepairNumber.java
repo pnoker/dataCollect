@@ -25,7 +25,6 @@ public class RepairNumber {
 		DBtool dBtool = new DBtool();
 		DBtool dBtool2 = new DBtool();
 		ResultSet rs = null;
-		ResultSet rs2 = null;
 		DateUtil dateUtil = new DateUtil();
 		Map<String, String> config = null;
 		try {
