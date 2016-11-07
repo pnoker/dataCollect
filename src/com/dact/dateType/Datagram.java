@@ -1,5 +1,6 @@
 package com.dact.dateType;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -62,13 +63,34 @@ public class Datagram {
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + ",getdate()";
+					boolean isnew = true;
+					String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 					try {
-						logWrite.write("执行sql：" + sql);
-						dBtool.executeUpdate(sql);
+						ResultSet rs = dBtool.executeQuery(sql);
+						while (rs.next()) {
+							isnew = false;
+						}
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					if (isnew) {
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
+					} else {
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
 					}
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
@@ -168,13 +190,34 @@ public class Datagram {
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + ",getdate()";
+					boolean isnew = true;
+					String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 					try {
-						logWrite.write("执行sql：" + sql);
-						dBtool.executeUpdate(sql);
+						ResultSet rs = dBtool.executeQuery(sql);
+						while (rs.next()) {
+							isnew = false;
+						}
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					if (isnew) {
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
+					} else {
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
 					}
 
 					if (lastime != null) {
@@ -267,13 +310,34 @@ public class Datagram {
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + ",getdate()";
+					boolean isnew = true;
+					String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 					try {
-						logWrite.write("执行sql：" + sql);
-						dBtool.executeUpdate(sql);
+						ResultSet rs = dBtool.executeQuery(sql);
+						while (rs.next()) {
+							isnew = false;
+						}
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					if (isnew) {
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
+					} else {
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
 					}
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
@@ -318,13 +382,34 @@ public class Datagram {
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-					String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + ",getdate()";
+					boolean isnew = true;
+					String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 					try {
-						logWrite.write("执行sql：" + sql);
-						dBtool.executeUpdate(sql);
+						ResultSet rs = dBtool.executeQuery(sql);
+						while (rs.next()) {
+							isnew = false;
+						}
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+					if (isnew) {
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
+					} else {
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+								+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+						try {
+							logWrite.write("执行sql：" + sql);
+							dBtool.executeUpdate(sql);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+						}
 					}
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
@@ -375,13 +460,34 @@ public class Datagram {
 				logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 				logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-				String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-						+ wia_longaddress + "'," + serial + ",getdate()";
+				boolean isnew = true;
+				String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 				try {
-					logWrite.write("执行sql：" + sql);
-					dBtool.executeUpdate(sql);
+					ResultSet rs = dBtool.executeQuery(sql);
+					while (rs.next()) {
+						isnew = false;
+					}
 				} catch (SQLException e) {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+				}
+				if (isnew) {
+					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+							+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+				} else {
+					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+							+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
 				}
 
 				String runInfo = MapInfo.shui_map.get(wia_longaddress);
@@ -479,14 +585,66 @@ public class Datagram {
 			/* PI数据类型，04 */
 			else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("PI数据类型");
+				int lose = 0;
+				if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
+					logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
+					logWrite.write("当前序列号：" + serial);
+					lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
+				} else {
+					MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+				}
+				MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+				logWrite.write("截至到上一次，丢包个数为：" + lose);
+				int num = 0;
+				float rate = 0;
+				if (MapInfo.number.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
+					num = MapInfo.number.get(wia_shortaddress + " " + base.getIpaddress()) + 1;
+				} else {
+					num++;
+				}
+				MapInfo.number.put(wia_shortaddress + " " + base.getIpaddress(), num);
+				int begin = MapInfo.base.get(wia_shortaddress + " " + base.getIpaddress());
+				if (begin == serial) {
+					rate = 100;
+				} else {
+					rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
+				}
+				logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
+				logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
+
+				boolean isnew = true;
+				String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
+				try {
+					ResultSet rs = dBtool.executeQuery(sql);
+					while (rs.next()) {
+						isnew = false;
+					}
+				} catch (SQLException e) {
+					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+				}
+				if (isnew) {
+					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+							+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+				} else {
+					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
+							+ ",rate = " + rate + " where longaddress = '" + wia_longaddress + "'";
+					try {
+						logWrite.write("执行sql：" + sql);
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+					}
+				}
 			}
 			/* DLT数据类型 */
 			else if (p.bytesToString(10, 10).equals("03")) {
 				logWrite.write("DLT数据类型 ");
-			}
-			/* 232数据类型 */
-			else if (p.bytesToString(10, 10).equals("04")) {
-				logWrite.write("232数据类型");
 			}
 		}
 		/* hart类型数据 */
@@ -519,13 +677,34 @@ public class Datagram {
 			logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 			logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
-			String sql = "insert into  Adapter_server (longaddress,datagram_serial,reachtime) values ('"
-					+ wia_longaddress + "'," + serial + ",getdate()";
+			boolean isnew = true;
+			String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";
 			try {
-				logWrite.write("执行sql：" + sql);
-				dBtool.executeUpdate(sql);
+				ResultSet rs = dBtool.executeQuery(sql);
+				while (rs.next()) {
+					isnew = false;
+				}
 			} catch (SQLException e) {
 				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+			}
+			if (isnew) {
+				sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+						+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+				try {
+					logWrite.write("执行sql：" + sql);
+					dBtool.executeUpdate(sql);
+				} catch (SQLException e) {
+					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+				}
+			} else {
+				sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
+						+ rate + " where longaddress = '" + wia_longaddress + "'";
+				try {
+					logWrite.write("执行sql：" + sql);
+					dBtool.executeUpdate(sql);
+				} catch (SQLException e) {
+					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
+				}
 			}
 
 			int i = 8;

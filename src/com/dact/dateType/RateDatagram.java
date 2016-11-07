@@ -13,13 +13,15 @@ public class RateDatagram {
 	public void excuteRateDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		DBtool dBtool = new DBtool();
 		int count = p.bytesToInt(2, 2);
-		float receive_rate = 0;
-		boolean isnew = true;
+		int receive_rate = 0;
 		String wia_longaddress = "", wia_shortaddress = "", sente = "";
 		for (int i = 0; i < count; i++) {
-
-			wia_shortaddress = p.bytesToString(2 + 2 * i, 3 + 2 * i);
-			receive_rate = Float.parseFloat(p.bytesToString(4 + 2 * i, 5 + 2 * i)) / 1000;
+			boolean isnew = true;
+			// 0111 07 0B00
+			// 1027 1100 1027 3100 1027 3600 1027 3A00 1027 4500 1027 4800 1027
+			// AEEA
+			wia_shortaddress = p.bytesToString(3 + 4 * i, 4 + 4 * i);
+			receive_rate = p.bytesToIntSmall(5 + 4 * i, 6 + 4 * i) / 100;
 			wia_longaddress = MapInfo.addressmap.get(wia_shortaddress + " " + base.getIpaddress());
 			sente = "select * from Adapter_gateway where longaddress = '" + wia_longaddress + "'";
 			try {

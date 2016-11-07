@@ -170,6 +170,16 @@ public class PackageProcessor {
 		return value;
 	}
 
+	public int hartCRC(int start, int end) {
+		int value = 0;
+		int length = end - start;
+		for (int i = length; i >= 0; i--) {
+			int num = ((inpackage[start + length - i] & 0xff) << (8 * i));
+			value ^= num;
+		}
+		return value;
+	}
+
 	public static void main(String[] args) {
 	}
 }
