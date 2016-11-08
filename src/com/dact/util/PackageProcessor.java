@@ -95,8 +95,7 @@ public class PackageProcessor {
 	public float bytesToFloatSmall(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1],
-					inpackage[startbit] };
+			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1], inpackage[startbit] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -108,8 +107,7 @@ public class PackageProcessor {
 	public float bytesToFloat3(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2],
-					inpackage[startbit + 3] };
+			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2], inpackage[startbit + 3] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -124,8 +122,7 @@ public class PackageProcessor {
 	public float bytesToFloatMiddle(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit],
-					inpackage[startbit + 1] };
+			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit], inpackage[startbit + 1] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -170,16 +167,53 @@ public class PackageProcessor {
 		return value;
 	}
 
-	public int hartCRC(int start, int end) {
-		int value = 0;
+	public boolean hartCRC(int start, int end) {
+		boolean resule = false;
+		int valueOne = 0;
 		int length = end - start;
 		for (int i = length; i >= 0; i--) {
-			int num = ((inpackage[start + length - i] & 0xff) << (8 * i));
-			value ^= num;
+			int vaule = ((inpackage[start + length - i] & 0xff));
+			valueOne ^= vaule;
 		}
-		return value;
+		int valueTwo = ((inpackage[end + 1] & 0xff));
+		if (valueOne == valueTwo) {
+			resule = true;
+		}
+		return resule;
+	}
+
+	public boolean WiaPaCRC(int start, int end, int crcIndex) {
+		boolean resule = false;
+		int valueOne = 0;
+		int valueCrc = 0x1021;
+		int ll = 0x8000;
+		int length = end - start;
+		for (int i = length; i >= 0; i--) {
+			valueOne ^= ((inpackage[start + length - i] << 8));
+			for (int n = 0; n < 8; n++) {
+				int  s= valueOne & ll;
+				if ((valueOne & ll) > 0) {
+					valueOne = ((valueOne << 1)) ^ valueCrc;
+				} else {
+					valueOne = (valueOne << 1) ;
+				}
+			}
+		}
+		int valueTwo = ((inpackage[crcIndex + 1] & 0xff) << 8) | ((inpackage[crcIndex] & 0xff));
+		if (valueOne == valueTwo) {
+			resule = true;
+		}
+		return resule;
 	}
 
 	public static void main(String[] args) {
+
+		byte[] test1 = { (byte) 0x01, (byte) 0x83, (byte) 0x0B, (byte) 0x00, (byte) 0x37, (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0x86, (byte) 0x26, (byte) 0x06, (byte) 0xA2, (byte) 0x86, (byte) 0x36, (byte) 0x01, (byte) 0x07, (byte) 0x00, (byte) 0x48, (byte) 0x0C, (byte) 0x3F, (byte) 0xB5, (byte) 0x6A,
+				(byte) 0xD2, (byte) 0xC4, (byte) 0x1A, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xB3, (byte) 0xA7, (byte) 0x00, (byte) 0x00, (byte) 0x78, (byte) 0xDD };
+		PackageProcessor p1 = new PackageProcessor(test1);
+		System.out.println(p1.WiaPaCRC(0, 36, 37));
+		System.out.println(p1.bytesToInt(37, 38));
+		System.out.println(p1.bytesToIntSmall(37, 38));
 	}
 }

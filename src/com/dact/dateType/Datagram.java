@@ -9,10 +9,12 @@ import com.dact.pojo.MapInfo;
 import com.dact.util.DBtool;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
+import com.dact.util.RateUtil;
 
 public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		DBtool dBtool = new DBtool();
+		RateUtil rateUtil = new RateUtil();
 		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, hartaddress = "";
 		String[] infoArr, eachArr;
 		int interval = 0, serial;
@@ -36,7 +38,8 @@ public class Datagram {
 				/* 水表 */
 				if (deviceType.equals("0e00")) {
 					logWrite.write("水表");
-					int lose = 0;
+					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					/*int lose = 0;
 					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 						logWrite.write("当前序列号：" + serial);
@@ -45,6 +48,9 @@ public class Datagram {
 						MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 					}
 					MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					if (lose < 0) {
+						lose = 0;
+					}
 					logWrite.write("截至到上一次，丢包个数为：" + lose);
 					int num = 0;
 					float rate = 0;
@@ -60,6 +66,9 @@ public class Datagram {
 					} else {
 						rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 					}
+					if (rate > 100) {
+						rate = 100;
+					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -74,8 +83,8 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 					if (isnew) {
-						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num)
+								+ "," + rate + ",getdate())";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -83,22 +92,20 @@ public class Datagram {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
 					} else {
-						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
-								+ "'";
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+								+ " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
 						} catch (SQLException e) {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
-					}
+					}*/
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					shuiliuliang = p.bytesToFloatSmall(11, 14);
 					logWrite.write("水表数据：" + shuiInfo + "=" + shuiliuliang);
-					String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shuiInfo
-							+ "',0," + shuiliuliang + ",getdate())";
+					String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + shuiliuliang + ",getdate())";
 					logWrite.write("向数据库表shui_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
 					try {
 						logWrite.write("执行sql：" + sente);
@@ -107,8 +114,7 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 					}
 
-					sente = "update [shui_opc] set value = " + shuiliuliang
-							+ ",reachtime = getdate() where typeserial = '" + shuiInfo + "_bt' and tag = 0";
+					sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "_bt' and tag = 0";
 					logWrite.write("更新当前数据库表shui_opc中的表头值：" + shuiInfo + "=" + shuiliuliang);
 					try {
 						logWrite.write("执行sql：" + sente);
@@ -132,11 +138,8 @@ public class Datagram {
 						shuiliuliang += 608;
 					}
 
-					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '"
-							+ shuiInfo + "') ";
-					sente += "update [shui_opc] set value = (select (" + shuiliuliang
-							+ "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo
-							+ "_0' and tag = 0";
+					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '" + shuiInfo + "') ";
+					sente += "update [shui_opc] set value = (select (" + shuiliuliang + "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo + "_0' and tag = 0";
 					logWrite.write("更新当前数据库表shui_opc中的瞬时值：" + shuiInfo + "=" + shuiliuliang);
 					try {
 						logWrite.write("执行sql：" + sente);
@@ -144,8 +147,7 @@ public class Datagram {
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.3：" + e.getMessage());
 					}
-					sente = "update [shui_opc] set value = " + shuiliuliang
-							+ ",reachtime = getdate() where typeserial = '" + shuiInfo + "' and tag = 0";
+					sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "' and tag = 0";
 					logWrite.write("更新当前数据库表shui_opc中的累计值：" + shuiInfo + "=" + shuiliuliang);
 					try {
 						logWrite.write("执行sql：" + sente);
@@ -164,13 +166,17 @@ public class Datagram {
 					wia_longaddress = wia_longaddress + " " + slaveID;
 					logWrite.write("从站地址：" + slaveID);
 					lastime = MapInfo.wirelessio_currentime.get(wia_longaddress);
-					int lose = 0;
+					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					/*int lose = 0;
 					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 						logWrite.write("当前序列号：" + serial);
 						lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 					} else {
 						MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					}
+					if (lose < 0) {
+						lose = 0;
 					}
 					MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 					logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -188,6 +194,9 @@ public class Datagram {
 					} else {
 						rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 					}
+					if (rate > 100) {
+						rate = 100;
+					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -202,8 +211,8 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 					if (isnew) {
-						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num)
+								+ "," + rate + ",getdate())";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -211,16 +220,15 @@ public class Datagram {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
 					} else {
-						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
-								+ "'";
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+								+ " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
 						} catch (SQLException e) {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
-					}
+					}*/
 
 					if (lastime != null) {
 						currentime = new Date();
@@ -234,11 +242,8 @@ public class Datagram {
 
 								eachArr = infoArr[i].split(" ");
 								if (eachArr[3].contains("int")) {
-									float tep_int = p.bytesToFloat(Integer.parseInt(eachArr[1]),
-											Integer.parseInt(eachArr[2]));
-									sente = "insert into [" + infoArr[1]
-											+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',"
-											+ (i - 2) + "," + tep_int + ",getdate())";
+									float tep_int = p.bytesToFloat(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "'," + (i - 2) + "," + tep_int + ",getdate())";
 									logWrite.write("向数据库表" + infoArr[1] + "_data中添加一条数据：" + infoArr[0] + "=" + tep_int);
 									try {
 										logWrite.write("执行sql：" + sente);
@@ -248,26 +253,21 @@ public class Datagram {
 									}
 								}
 								if (eachArr[3].contains("long")) {
-									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]),
-											Integer.parseInt(eachArr[2]));
+									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
 									if (i - 2 == 0) {
 										tep_int = (long) (tep_int * 0.0000001);
 									} else if (i - 2 == 1) {
 										tep_int = (long) (tep_int * 0.1);
 									} else {
 									}
-									sente = "insert into [" + infoArr[1]
-											+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',"
-											+ (i - 2) + "," + tep_int + ",getdate())";
+									sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "'," + (i - 2) + "," + tep_int + ",getdate())";
 									try {
 										logWrite.write("执行sql：" + sente);
 										dBtool.executeUpdate(sente);
 									} catch (SQLException e) {
 										logWrite.write("【 Error!】Datagram.excuteDatagram.6：" + e.getMessage());
 									}
-									sente = "update [shui_opc] set value = " + tep_int
-											+ ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_"
-											+ (i - 2) + "'";
+									sente = "update [shui_opc] set value = " + tep_int + ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_" + (i - 2) + "'";
 									try {
 										logWrite.write("执行sql：" + sente);
 										dBtool.executeUpdate(sente);
@@ -285,13 +285,17 @@ public class Datagram {
 				logWrite.write("AI数据类型");
 				if (deviceType.equals("0e00")) {
 					logWrite.write("设备类型为，0e00，水表");
-					int lose = 0;
+					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					/*int lose = 0;
 					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 						logWrite.write("当前序列号：" + serial);
 						lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 					} else {
 						MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					}
+					if (lose < 0) {
+						lose = 0;
 					}
 					MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 					logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -309,6 +313,9 @@ public class Datagram {
 					} else {
 						rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 					}
+					if (rate > 100) {
+						rate = 100;
+					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -323,8 +330,8 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 					if (isnew) {
-						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num)
+								+ "," + rate + ",getdate())";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -332,24 +339,22 @@ public class Datagram {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
 					} else {
-						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
-								+ "'";
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+								+ " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
 						} catch (SQLException e) {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
-					}
+					}*/
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
 					dianya = (float) dianya_tmp / 100;
 					logWrite.write("水表电压数据：" + shuiInfo + "=" + dianya);
 
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
-							+ "',0," + dianya + ",getdate())";
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
@@ -358,13 +363,17 @@ public class Datagram {
 					}
 				} else if (deviceType.equals("0c00")) {
 					logWrite.write("设备类型为，0c00，无线表");
-					int lose = 0;
+					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					/*int lose = 0;
 					if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 						logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 						logWrite.write("当前序列号：" + serial);
 						lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 					} else {
 						MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+					}
+					if (lose < 0) {
+						lose = 0;
 					}
 					MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 					logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -382,6 +391,9 @@ public class Datagram {
 					} else {
 						rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 					}
+					if (rate > 100) {
+						rate = 100;
+					}
 					logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 					logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -396,8 +408,8 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 					if (isnew) {
-						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-								+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+						sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num)
+								+ "," + rate + ",getdate())";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
@@ -405,16 +417,15 @@ public class Datagram {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
 					} else {
-						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-								+ ",rate = " + rate + ",reachtime = getdate()  where longaddress = '" + wia_longaddress
-								+ "'";
+						sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+								+ ",reachtime = getdate()  where longaddress = '" + wia_longaddress + "'";
 						try {
 							logWrite.write("执行sql：" + sql);
 							dBtool.executeUpdate(sql);
 						} catch (SQLException e) {
 							logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 						}
-					}
+					}*/
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
@@ -423,8 +434,7 @@ public class Datagram {
 					dianya = (float) dianya_tmp / 100;
 					logWrite.write("通道0数据，温度数据：" + shuiInfo + "=" + tem1);
 					logWrite.write("通道1数据，温度数据：" + shuiInfo + "=" + tem2);
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
-							+ "',0," + dianya + ",getdate())";
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
@@ -437,13 +447,17 @@ public class Datagram {
 			/* 开润开封数据类型 */
 			else if (p.bytesToString(10, 10).equals("07")) {
 				logWrite.write("开润开封数据类型");
-				int lose = 0;
+				rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+				/*int lose = 0;
 				if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 					logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 					logWrite.write("当前序列号：" + serial);
 					lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 				} else {
 					MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+				}
+				if (lose < 0) {
+					lose = 0;
 				}
 				MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 				logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -461,6 +475,9 @@ public class Datagram {
 				} else {
 					rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 				}
+				if (rate > 100) {
+					rate = 100;
+				}
 				logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 				logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -475,8 +492,8 @@ public class Datagram {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 				}
 				if (isnew) {
-					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num) + ","
+							+ rate + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
@@ -484,16 +501,15 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 				} else {
-					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-							+ ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress
-							+ "'";
+					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+							+ " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
-				}
+				}*/
 
 				String runInfo = MapInfo.shui_map.get(wia_longaddress);
 				if (runInfo == null) {
@@ -569,8 +585,7 @@ public class Datagram {
 					break;
 				}
 
-				String sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "',"
-						+ tag + "," + kairun + ",getdate())";
+				String sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "'," + tag + "," + kairun + ",getdate())";
 				try {
 					logWrite.write("执行sql：" + sente);
 					dBtool.executeUpdate(sente);
@@ -578,8 +593,7 @@ public class Datagram {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.9：" + e.getMessage());
 				}
 
-				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '"
-						+ runInfo + "_" + tag + "'";
+				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '" + runInfo + "_" + tag + "'";
 				try {
 					logWrite.write("执行sql：" + sente);
 					dBtool.executeUpdate(sente);
@@ -590,13 +604,17 @@ public class Datagram {
 			/* PI数据类型，04 */
 			else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("PI数据类型");
-				int lose = 0;
+				rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+				/*int lose = 0;
 				if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 					logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 					logWrite.write("当前序列号：" + serial);
 					lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 				} else {
 					MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+				}
+				if (lose < 0) {
+					lose = 0;
 				}
 				MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 				logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -614,6 +632,9 @@ public class Datagram {
 				} else {
 					rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 				}
+				if (rate > 100) {
+					rate = 100;
+				}
 				logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 				logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -628,8 +649,8 @@ public class Datagram {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 				}
 				if (isnew) {
-					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-							+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+					sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num) + ","
+							+ rate + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
@@ -637,16 +658,15 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
 				} else {
-					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose
-							+ ",rate = " + rate + ",reachtime = getdate()  where longaddress = '" + wia_longaddress
-							+ "'";
+					sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate
+							+ ",reachtime = getdate()  where longaddress = '" + wia_longaddress + "'";
 					try {
 						logWrite.write("执行sql：" + sql);
 						dBtool.executeUpdate(sql);
 					} catch (SQLException e) {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 					}
-				}
+				}*/
 			}
 			/* DLT数据类型 */
 			else if (p.bytesToString(10, 10).equals("03")) {
@@ -656,13 +676,17 @@ public class Datagram {
 		/* hart类型数据 */
 		else {
 			logWrite.write("hart类型数据");
-			int lose = 0;
+			rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+			/*int lose = 0;
 			if (MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()) != null) {
 				logWrite.write("上一次序列号：" + MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress()));
 				logWrite.write("当前序列号：" + serial);
 				lose = (serial - MapInfo.serial.get(wia_shortaddress + " " + base.getIpaddress())) - 1;
 			} else {
 				MapInfo.base.put(wia_shortaddress + " " + base.getIpaddress(), serial);
+			}
+			if(lose<0){
+				lose = 0;
 			}
 			MapInfo.serial.put(wia_shortaddress + " " + base.getIpaddress(), serial);
 			logWrite.write("截至到上一次，丢包个数为：" + lose);
@@ -680,6 +704,9 @@ public class Datagram {
 			} else {
 				rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
 			}
+			if(rate>100){
+				rate =100;
+			}
 			logWrite.write("总计，丢包个数为：" + (serial - begin + 1 - num));
 			logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + rate + "%");
 
@@ -694,8 +721,8 @@ public class Datagram {
 				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 			}
 			if (isnew) {
-				sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-						+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+				sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + (serial - begin + 1 - num) + ","
+						+ rate + ",getdate())";
 				try {
 					logWrite.write("执行sql：" + sql);
 					dBtool.executeUpdate(sql);
@@ -703,15 +730,15 @@ public class Datagram {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 				}
 			} else {
-				sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
-						+ rate + ",reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
+				sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + (serial - begin + 1 - num) + ",rate = " + rate + ",reachtime = getdate() where longaddress = '"
+						+ wia_longaddress + "'";
 				try {
 					logWrite.write("执行sql：" + sql);
 					dBtool.executeUpdate(sql);
 				} catch (SQLException e) {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 				}
-			}
+			}*/
 
 			int i = 8;
 			int sure = 0;
@@ -742,17 +769,14 @@ public class Datagram {
 						secondvalue = p.bytesToFloat3(sure + 20, sure + 23);
 						logWrite.write("第二变量值是：" + secondvalue);
 						if (infoArr[2].equals("false") && infoArr[3].equals("false")) {
-							String sente = "insert into [" + infoArr[1]
-									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
-									+ firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.11：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -764,25 +788,21 @@ public class Datagram {
 
 						else if (infoArr[2].equals("true") && infoArr[3].equals("false")) {
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
-							String sente = "insert into [" + infoArr[1]
-									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
-									+ firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.13：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.14：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',2,'" + thirdvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',2,'" + thirdvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -795,9 +815,7 @@ public class Datagram {
 
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
 							fourthvalue = p.bytesToFloat3(sure + 30, sure + 33);
-							String sente = "insert into [" + infoArr[1]
-									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
-									+ firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -805,8 +823,7 @@ public class Datagram {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.16：" + e.getMessage());
 							}
 
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -814,8 +831,7 @@ public class Datagram {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.17：" + e.getMessage());
 							}
 
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',2," + thirdvalue + ",getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',2," + thirdvalue + ",getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -823,8 +839,7 @@ public class Datagram {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.18：" + e.getMessage());
 							}
 
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
-									+ infoArr[0] + "',3,'" + fourthvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',3,'" + fourthvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -833,13 +848,10 @@ public class Datagram {
 							}
 
 							// opc相关
-							if ((infoArr[0].equals("T1线")) || (infoArr[0].equals("T2线"))
-									|| (infoArr[0].equals("食堂用天然气"))) {
-								sente = "update [hart01_opc] set flow1 = " + firstvalue + ",flow2 = " + secondvalue
-										+ ",flow3 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
+						/*	if ((infoArr[0].equals("T1线")) || (infoArr[0].equals("T2线")) || (infoArr[0].equals("食堂用天然气"))) {
+								sente = "update [hart01_opc] set flow1 = " + firstvalue + ",flow2 = " + secondvalue + ",flow3 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.weihao_map.get(infoArr[0]) + "'";
-								logWrite.write("更新当前数据库表hart01_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "="
-										+ firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
+								logWrite.write("更新当前数据库表hart01_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "=" + firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
 								try {
 									logWrite.write("执行sql：" + sente);
 									dBtool.executeUpdate(sente);
@@ -847,11 +859,9 @@ public class Datagram {
 									logWrite.write("【 Error!】Datagram.excuteDatagram.20：" + e.getMessage());
 								}
 							} else if ((infoArr[0].equals("焦化蜡油线")) || (infoArr[0].equals("20线"))) {
-								sente = "update [hart02_opc] set density = " + firstvalue + ",temp = " + secondvalue
-										+ ",flow = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
+								sente = "update [hart02_opc] set density = " + firstvalue + ",temp = " + secondvalue + ",flow = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.weihao_map.get(infoArr[0]) + "'";
-								logWrite.write("更新当前数据库表hart02_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "="
-										+ firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
+								logWrite.write("更新当前数据库表hart02_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "=" + firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
 								try {
 									logWrite.write("执行sql：" + sente);
 									dBtool.executeUpdate(sente);
@@ -859,18 +869,16 @@ public class Datagram {
 									logWrite.write("【 Error!】Datagram.excuteDatagram.21：" + e.getMessage());
 								}
 							} else if ((infoArr[0].equals("27-2线"))) {
-								sente = "update [hart03_opc] set flow1 = " + firstvalue + ",temp = " + secondvalue
-										+ ",flow2 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
+								sente = "update [hart03_opc] set flow1 = " + firstvalue + ",temp = " + secondvalue + ",flow2 = " + thirdvalue + ",total = " + fourthvalue + " where typeserial = '"
 										+ MapInfo.weihao_map.get(infoArr[0]) + "'";
-								logWrite.write("更新当前数据库表hart03_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "="
-										+ firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
+								logWrite.write("更新当前数据库表hart03_opc中的累计值：" + MapInfo.weihao_map.get(infoArr[0]) + "=" + firstvalue + "," + secondvalue + "," + thirdvalue + "," + fourthvalue);
 								try {
 									logWrite.write("执行sql：" + sente);
 									dBtool.executeUpdate(sente);
 								} catch (SQLException e) {
 									logWrite.write("【 Error!】Datagram.excuteDatagram.22：" + e.getMessage());
 								}
-							}
+							}*/
 
 						}
 					}

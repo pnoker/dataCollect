@@ -46,11 +46,11 @@ public class RepairNumber {
 				val = rs.getFloat("value");
 				Date date = sdf.parse(time);
 				Date now = new Date();
-				long intervel = (now.getTime() - date.getTime()) / (1000 * 60);
+				long intervel = (now.getTime() - date.getTime()) / 1000;
 				logWrite.write("本次 " + temp[1] + " 的数据时间间隔为 " + intervel + " 分钟");
-				if (intervel >= 70) {
+				if (intervel >= Long.parseLong(temp[3])) {
 					logWrite.write("发现数据丢包了 ");
-					date.setTime(date.getTime() + (1000 * 60 * 60));
+					date.setTime(date.getTime() + (1000 * Long.parseLong(temp[4])));
 					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1] + "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
 					logWrite.write("填补数据: " + temp[1] + " , " + val + ", " + sdf.format(date));
 					dBtool2.executeUpdate(sql);
@@ -82,6 +82,7 @@ public class RepairNumber {
 		}
 		rs.close();
 		dBtool.free();
+		dBtool2.free();
 		logWrite.write("<---------结束，检测数据丢包程序--------->");
 	}
 }

@@ -80,12 +80,11 @@ public class NetDatagram {
 		MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
 		MapInfo.typemap.put(wia_longaddress, deviceType);
 
-		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")))) {
+		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")) || (wia_longaddress.equals("007a410000000a7e")) || (wia_longaddress.equals("007a4100000025e0")))) {
 			this.networkinfo = networkinfo + wia_longaddress + ",";
 			this.networkinfo = noRepeat(this.networkinfo);
 		}
-		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '"
-				+ base.getIpaddress() + "'";
+		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '" + base.getIpaddress() + "'";
 		logWrite.write("更新网关的网络拓扑信息为：" + this.networkinfo);
 		try {
 			logWrite.write("执行sql：" + sente);
