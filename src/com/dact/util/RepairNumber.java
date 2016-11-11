@@ -47,7 +47,7 @@ public class RepairNumber {
 				Date date = sdf.parse(time);
 				Date now = new Date();
 				long intervel = (now.getTime() - date.getTime()) / 1000;
-				logWrite.write("本次 " + temp[1] + " 的数据时间间隔为 " + intervel + " 分钟");
+				logWrite.write("本次 " + temp[1] + " 的数据时间间隔为 " + (intervel) / 60 + " 分钟");
 				if (intervel >= Long.parseLong(temp[3])) {
 					logWrite.write("发现数据丢包了 ");
 					date.setTime(date.getTime() + (1000 * Long.parseLong(temp[4])));

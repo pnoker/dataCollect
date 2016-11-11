@@ -8,7 +8,9 @@ import java.util.Date;
 
 public class LogWrite {
 	private BufferedWriter fw = null;
-	private String path = "D:/dataCollect/log/";
+	private BufferedWriter fwEasy = null;
+	private String path = "D:/dataCollect/SiaLog/";
+	private String pathEasy = "D:/dataCollect/Log/";
 	private String ipaddress;
 	private String fromIp;
 	private DateUtil date;
@@ -24,6 +26,9 @@ public class LogWrite {
 		this.date = new DateUtil();
 		if (!(new File(path + ipaddress).isDirectory())) {
 			new File(path + ipaddress).mkdirs();
+		}
+		if (!(new File(pathEasy + ipaddress).isDirectory())) {
+			new File(pathEasy + ipaddress).mkdirs();
 		}
 	}
 
@@ -42,6 +47,22 @@ public class LogWrite {
 		}
 	}
 
+	public void writeEasy(String type, String detail) {
+		DateUtil dateUtil = new DateUtil();
+		String file = pathEasy + ipaddress + "/" + dateUtil.getDayTime(new Date()) + ".txt";
+		String regex = "(.{2})";
+		detail = detail.replaceAll(regex, "$1 ");
+		try {
+			FileOutputStream fos = new FileOutputStream(file, true);
+			fwEasy = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+			fwEasy.write(date.getCompleteTime(new Date()) + " " + fromIp + " --> " + type + detail);
+			fwEasy.newLine();
+			fwEasy.flush();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 	public void close() {
 
 		try {
@@ -49,5 +70,12 @@ public class LogWrite {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+
+	public static void main(String[] args) {
+		String detail = "01830b00cd450000740010";
+		String regex = "(.{2})";
+		detail = detail.replaceAll(regex, "$1 ");
+		System.out.println(detail);
 	}
 }

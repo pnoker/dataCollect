@@ -118,16 +118,19 @@ public class ReceiverDatagram implements Runnable {
 					/* 0101节点加入信息 */
 					case "0101":
 						logWrite.write("网络报文:" + hexDatagram);
+						logWrite.writeEasy("网络报文:" ,hexDatagram);
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
 						break;
 					case "0111":
-						logWrite.write("节点到网关的成功率报文:" + hexDatagram);
+						logWrite.write("统计报文:" + hexDatagram);
+						logWrite.writeEasy("统计报文:" ,hexDatagram);
 						rateDatagram.excuteRateDatagram(p, base, logWrite);
 						break;
 					/* 节点测试信息 */
 					case "010f":
 						logWrite.write("健康报文:" + hexDatagram);
+						logWrite.writeEasy("健康报文:" ,hexDatagram);
 						if (healthDatagram.excuteHealthDatagram(p, base, logWrite)) {
 							String shortAddress = p.bytesToString(2, 3);
 							String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
@@ -140,10 +143,12 @@ public class ReceiverDatagram implements Runnable {
 					/* 节点数据信息 */
 					case "0183":
 						logWrite.write("数据报文:" + hexDatagram);
+						logWrite.writeEasy("数据报文:" ,hexDatagram);
 						datagram.excuteDatagram(p, base, logWrite);
 						break;
 					default:
 						logWrite.write("其他报文:" + hexDatagram);
+						logWrite.writeEasy("其他报文:" ,hexDatagram);
 					}
 				} catch (Exception e) {
 					logWrite.write("datagramSocket.receive 堵塞超时，" + e.getMessage());
