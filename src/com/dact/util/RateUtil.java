@@ -63,6 +63,17 @@ public class RateUtil {
 		 */
 
 		int begin = MapInfo.base.get(wia_shortaddress + " " + ipAddress);
+		int lose_total = serial - begin + 1 - num;
+		if (lose_total < 0) {
+			lose_total = 0;
+		} else if (lose_total > 10) {// 当丢包个数大于10，就重新计算
+			lose_total = 0;
+			num = 1;
+			MapInfo.base.put(wia_shortaddress + " " + ipAddress, serial);
+			MapInfo.number.put(wia_shortaddress + " " + ipAddress, num);
+		}
+
+		begin = MapInfo.base.get(wia_shortaddress + " " + ipAddress);
 		if (begin == serial) {
 			rate = 100;
 		} else {
@@ -71,13 +82,10 @@ public class RateUtil {
 		if (rate > 100) {
 			rate = 100;
 		}
-		int lose_total = serial - begin + 1 - num;
 		int total = serial - begin + 1;
-		if (lose_total < 0) {
-			lose_total = 0;
-		}
 		logWrite.write("总计，丢包个数为：" + lose_total);
-		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = " + rate + " %");
+		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = "
+				+ rate + " %");
 
 		updataRate(wia_longaddress, serial, rate, lose_total, logWrite);
 	}
@@ -95,8 +103,12 @@ public class RateUtil {
 		} catch (SQLException e) {
 			logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 		}
+		if(wia_longaddress.equals("null")){
+			isnew = false;
+		}
 		if (isnew) {
-			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+					+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
@@ -104,7 +116,8 @@ public class RateUtil {
 				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 			}
 		} else {
-			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
+			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
+					+ rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
