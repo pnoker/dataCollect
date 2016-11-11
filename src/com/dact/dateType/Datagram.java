@@ -38,7 +38,7 @@ public class Datagram {
 				/* 水表 */
 				if (deviceType.equals("0e00")) {
 					logWrite.write("水表");
-					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					shuiliuliang = p.bytesToFloatSmall(11, 14);
@@ -104,7 +104,7 @@ public class Datagram {
 					wia_longaddress = wia_longaddress + " " + slaveID;
 					logWrite.write("从站地址：" + slaveID);
 					lastime = MapInfo.wirelessio_currentime.get(wia_longaddress);
-					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 					if (lastime != null) {
 						currentime = new Date();
@@ -161,7 +161,7 @@ public class Datagram {
 				logWrite.write("AI数据类型");
 				if (deviceType.equals("0e00")) {
 					logWrite.write("设备类型为，0e00，水表");
-					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
@@ -177,7 +177,7 @@ public class Datagram {
 					}
 				} else if (deviceType.equals("0c00")) {
 					logWrite.write("设备类型为，0c00，无线表");
-					rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					int dianya_tmp = p.doublebytesToInt(11, 12);
@@ -199,7 +199,7 @@ public class Datagram {
 			/* 开润开封数据类型 */
 			else if (p.bytesToString(10, 10).equals("07")) {
 				logWrite.write("开润开封数据类型");
-				rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 				String runInfo = MapInfo.shui_map.get(wia_longaddress);
 				if (runInfo == null) {
@@ -294,7 +294,7 @@ public class Datagram {
 			/* PI数据类型，04 */
 			else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("PI数据类型");
-				rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 			}
 			/* DLT数据类型 */
 			else if (p.bytesToString(10, 10).equals("03")) {
@@ -304,7 +304,7 @@ public class Datagram {
 		/* hart类型数据 */
 		else {
 			logWrite.write("hart类型数据");
-			rateUtil.rate(wia_shortaddress, base.getIpaddress(), serial, logWrite);
+			rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 			int i = 8;
 			int sure = 0;

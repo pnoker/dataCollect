@@ -7,9 +7,8 @@ import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
 
 public class RateUtil {
-	public void rate(String wia_shortaddress, String ipAddress, int serial, LogWrite logWrite) {
+	public void rate(String wia_shortaddress, String wia_longaddress, String ipAddress, int serial, LogWrite logWrite) {
 
-		String wia_longaddress = MapInfo.addressmap.get(wia_shortaddress + " " + ipAddress);
 		int lose = 0, num = 0;
 		float rate = 0;
 		if (MapInfo.serial.get(wia_shortaddress + " " + ipAddress) != null) {
@@ -27,6 +26,7 @@ public class RateUtil {
 			}
 			/* 当前序列号大于上一次，正常 */
 			else if (now_serial > last_serial) {
+				logWrite.write("当前设备的长地址（长地址加上从栈地址）为：" + wia_longaddress);
 				logWrite.write("上一次序列号：" + last_serial);
 				logWrite.write("当前序列号：" + now_serial);
 				lose = now_serial - last_serial - 1;
