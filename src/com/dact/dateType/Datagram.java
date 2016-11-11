@@ -29,7 +29,6 @@ public class Datagram {
 
 		logWrite.write("长地址：" + wia_longaddress);
 		logWrite.write("短地址：" + wia_shortaddress);
-		logWrite.write("设备类型：" + deviceType);
 
 		/* 无线IO类型,7400 */
 		if (p.bytesToString(8, 9).equals("7400")) {
@@ -323,7 +322,6 @@ public class Datagram {
 
 				if (interval > 10) {
 					hartaddress = p.bytesToString(sure + 1, sure + 5);
-					logWrite.write("hart设备长地址：" + hartaddress);
 					// 命令号
 					String commandnum = p.bytesToString(sure + 6, sure + 6);
 					logWrite.write("命令号：" + commandnum + "号");
