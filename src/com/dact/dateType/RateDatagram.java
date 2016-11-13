@@ -32,17 +32,18 @@ public class RateDatagram {
 			} catch (SQLException e) {
 				logWrite.write(e.getMessage());
 			}
+			if (wia_longaddress == null) {
+				isnew = false;
+			}
 			if (isnew) {
-				sente = "insert into Adapter_gateway (longaddress,rate,reachtime) values ('" + wia_longaddress + "',"
-						+ receive_rate + ",getdate())";
+				sente = "insert into Adapter_gateway (longaddress,rate,reachtime) values ('" + wia_longaddress + "'," + receive_rate + ",getdate())";
 				try {
 					dBtool.executeUpdate(sente);
 				} catch (SQLException e) {
 					logWrite.write(e.getMessage());
 				}
 			} else {
-				sente = "update Adapter_gateway set rate = " + receive_rate
-						+ ",reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
+				sente = "update Adapter_gateway set rate = " + receive_rate + ",reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 				try {
 					dBtool.executeUpdate(sente);
 				} catch (SQLException e) {
