@@ -29,15 +29,7 @@ public class HealthDatagram {
 		String shortAddress = p.bytesToString(2, 3);
 		/* 短地址为0100，表示是该网关的健康报文 */
 		if (shortAddress.equals("0100")) {
-			String sente = "update [network_restart] set status = 1,reachtime = getdate() where ipaddress = '" + base.getIpaddress() + "'";
 			MapInfo.gateway_currentime.put(base.getIpaddress(), (new Date()).getTime());
-			try {
-				logWrite.write("执行sql：" + sente);
-				dBtool.executeUpdate(sente);
-				dBtool.free();
-			} catch (SQLException e) {
-				logWrite.write("excuteHealthDatagram:" + e.getMessage());
-			}
 		} else if (shortAddress.equals("0000")) {
 			// 备用短地址，不做任何操作
 		} else {// 其他短地址，即：节点的短地址
