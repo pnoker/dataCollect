@@ -79,7 +79,7 @@ public class ReceiverDatagram implements Runnable {
 						stop = true;
 					}
 				} catch (Exception e) {
-					System.out.println("MapInfo.gateway_currentime.get(base.getIpaddress()):" + e.getMessage());
+					System.out.println("MapInfo.gateway_currentime.get(" + base.getIpaddress() + "):" + e.getMessage());
 				}
 			}
 		}, 1000 * 10, 1000 * 60 * 2);
