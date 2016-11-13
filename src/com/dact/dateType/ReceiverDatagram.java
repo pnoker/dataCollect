@@ -69,13 +69,17 @@ public class ReceiverDatagram implements Runnable {
 					}
 				}
 				logWrite.write("<---- 检测网关健康报文时间间隔 ---->");
-				long interval = (second - MapInfo.gateway_currentime.get(base.getIpaddress())) / (1000 * 60);
-				if (interval >= 5) {// 网关的健康报文时间间隔大于5分钟就打印出来
-					logWrite.write("< ----网关:" + base.getIpaddress() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
-				}
-				if (interval >= 10) {
-					logWrite.write("< ---- 设置 stop = true  ---->");
-					stop = true;
+				try {
+					long interval = (second - MapInfo.gateway_currentime.get(base.getIpaddress())) / (1000 * 60);
+					if (interval >= 5) {// 网关的健康报文时间间隔大于5分钟就打印出来
+						logWrite.write("< ----网关:" + base.getIpaddress() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
+					}
+					if (interval >= 10) {
+						logWrite.write("< ---- 设置 stop = true  ---->");
+						stop = true;
+					}
+				} catch (Exception e) {
+					System.out.println("MapInfo.gateway_currentime.get(base.getIpaddress()):" + e.getMessage());
 				}
 			}
 		}, 1000 * 10, 1000 * 60 * 2);
