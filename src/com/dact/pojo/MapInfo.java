@@ -15,7 +15,7 @@ public class MapInfo {
 	public static Map<String, String> pi_map = new HashMap<String, String>();
 	// 位号map
 	public static Map<String, String> weihao_map = new HashMap<String, String>();
-	public static Map<String, Date> gateway_currentime = new HashMap<String, Date>();
+	public static Map<String, Long> gateway_currentime = new HashMap<String, Long>();
 	public static Map<String, Date> wirelessio_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> hart_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> ai_currentime = new HashMap<String, Date>();
@@ -96,11 +96,11 @@ public class MapInfo {
 		MapInfo.weihao_map = weihao_map;
 	}
 
-	public static Map<String, Date> getGateway_currentime() {
+	public static Map<String, Long> getGateway_currentime() {
 		return gateway_currentime;
 	}
 
-	public static void setGateway_currentime(Map<String, Date> gateway_currentime) {
+	public static void setGateway_currentime(Map<String, Long> gateway_currentime) {
 		MapInfo.gateway_currentime = gateway_currentime;
 	}
 

@@ -38,8 +38,7 @@ public class ReceiverDatagram implements Runnable {
 		try {
 			this.base = base;
 			this.datagramSocket = new DatagramSocket(base.getLocalport());
-			this.datagramSend = new DatagramPacket(sendCode, sendCode.length,
-					InetAddress.getByName(base.getIpaddress()), base.getPort());
+			this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(base.getIpaddress()), base.getPort());
 			this.datagramReceive = new DatagramPacket(buf, 1024);
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
@@ -57,14 +56,15 @@ public class ReceiverDatagram implements Runnable {
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				logWrite.write("<-'-'-'- 检测健康报文时间间隔 -'-'-'->");
+				logWrite.write("<---- 检测健康报文时间间隔 ---->");
 				long second = (new Date()).getTime();
 				for (Entry<String, Long> entry : firstTime.entrySet()) {
 					long interval = (second - entry.getValue()) / (1000 * 60);
+					if (interval >= 5) {
+						logWrite.write("< ----网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
+					}
 					if (interval >= 10) {
-						logWrite.write(
-								"<-'-'-'-网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟-'-'-'->");
-						logWrite.write("<-'-'-'- 设置 stop = true -'-'-'->");
+						logWrite.write("< ---- 设置 stop = true  ---->");
 						stop = true;
 					}
 				}
@@ -118,40 +118,39 @@ public class ReceiverDatagram implements Runnable {
 					/* 0101节点加入信息 */
 					case "0101":
 						logWrite.write("网络报文:" + hexDatagram);
-						logWrite.writeEasy("网络报文:" ,hexDatagram);
+						logWrite.writeEasy("网络报文:", hexDatagram);
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
 						break;
 					case "0111":
 						logWrite.write("统计报文:" + hexDatagram);
-						logWrite.writeEasy("统计报文:" ,hexDatagram);
+						logWrite.writeEasy("统计报文:", hexDatagram);
 						rateDatagram.excuteRateDatagram(p, base, logWrite);
 						break;
 					/* 节点测试信息 */
 					case "010f":
 						logWrite.write("健康报文:" + hexDatagram);
-						logWrite.writeEasy("健康报文:" ,hexDatagram);
+						logWrite.writeEasy("健康报文:", hexDatagram);
 						if (healthDatagram.excuteHealthDatagram(p, base, logWrite)) {
 							String shortAddress = p.bytesToString(2, 3);
 							String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
 							Date date = new Date();
 							/* 更新该节点的最后一次健康报文到达的时间戳 */
-							logWrite.write("更新节点（长地址：" + longAddress + "）最后一次健康报文到达时间戳为:" + date.getTime());
 							firstTime.put(longAddress, date.getTime());
 						}
 						break;
 					/* 节点数据信息 */
 					case "0183":
 						logWrite.write("数据报文:" + hexDatagram);
-						logWrite.writeEasy("数据报文:" ,hexDatagram);
+						logWrite.writeEasy("数据报文:", hexDatagram);
 						datagram.excuteDatagram(p, base, logWrite);
 						break;
 					default:
 						logWrite.write("其他报文:" + hexDatagram);
-						logWrite.writeEasy("其他报文:" ,hexDatagram);
+						logWrite.writeEasy("其他报文:", hexDatagram);
 					}
 				} catch (Exception e) {
-					logWrite.write("datagramSocket.receive 堵塞超时，" + e.getMessage());
+					logWrite.write("datagramSocket.receive 堵塞/连接超时：" + e.getMessage());
 					try {
 						logWrite.write("<-'-'-'-重新发送采数命令:010BFFFF4A9B-'-'-'->");
 						datagramSocket.send(datagramSend);
