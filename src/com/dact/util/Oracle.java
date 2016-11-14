@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Oracle {
-	public static String user = "aqsh";
-	public static String pwd = "aqsh";
-	
+	public static String user = "cems";
+	public static String pwd = "cems";
+
 	private Connection connection = null;
 	public Statement statement = null;
 	private ResultSet result = null;
@@ -17,8 +17,8 @@ public class Oracle {
 	public Oracle() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String url = "jdbc:oracle:thin:@221.180.150.131:8008:xywdb11";
-			connection = DriverManager.getConnection(url,user,pwd);
+			String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+			connection = DriverManager.getConnection(url, user, pwd);
 			statement = connection.createStatement();
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
@@ -59,9 +59,10 @@ public class Oracle {
 			System.out.println("ERROR:" + se.getMessage());
 		}
 	}
+
 	public static void main(String[] args) {
 		Oracle oracle = new Oracle();
-		
+
 	}
 
 }

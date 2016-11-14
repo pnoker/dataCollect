@@ -5,9 +5,8 @@ import java.util.ArrayList;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.util.Sqlserver;
-import com.dact.util.DateUtil;
 import com.dact.util.LogWrite;
+import com.dact.util.Oracle;
 import com.dact.util.PackageProcessor;
 import com.dact.util.PrintUtil;
 
@@ -48,15 +47,9 @@ public class NetDatagram {
 	 * 由于数据报文只有短地址，于是只能通过网络报文提供的对应关系确定设备
 	 */
 	public void excuteNetDatagram(PackageProcessor p, BaseInfo base, String networkinfo, LogWrite logWrite) {
-		Sqlserver dBtool = new Sqlserver();
+		Oracle dBtool = new Oracle();
 		PrintUtil printUtil = new PrintUtil();
-		DateUtil dateUtil = new DateUtil();
 		String wia_longaddress = "", wia_shortaddress = "", deviceType = "";
-		/*
-		 * 网络报文:01 01/43 29 00 00 00 41 7A 00/11 00/0E 00/04/01/00 00/0C 00/0D
-		 * 00/01/01
-		 * 00/0E00/FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00/9A 6C
-		 */
 		wia_longaddress = p.bytesToString(2, 9);
 		wia_shortaddress = p.bytesToString(10, 11);
 
@@ -69,14 +62,6 @@ public class NetDatagram {
 		logWrite.write("邻居个数：" + neighbor);
 		logWrite.write("设备类型：" + deviceType);
 
-		/*
-		 * Iterator<Entry<String, String>> iterator =
-		 * MapInfo.addressmap.entrySet().iterator(); while (iterator.hasNext())
-		 * { Entry<String, String> entry = iterator.next(); String longaddress =
-		 * entry.getValue(); if (wia_longaddress.equals(longaddress)) {
-		 * iterator.remove(); } }
-		 */
-
 		MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
 		MapInfo.typemap.put(wia_longaddress, deviceType);
 
@@ -84,7 +69,7 @@ public class NetDatagram {
 			this.networkinfo = networkinfo + wia_longaddress + ",";
 			this.networkinfo = noRepeat(this.networkinfo);
 		}
-		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '" + base.getIpaddress() + "'";
+		String sente = "update Network_tuopu set manydevices = '" + this.networkinfo + "' where ipaddress = '" + base.getIpaddress() + "'";
 		logWrite.write("更新网关的网络拓扑信息为：" + this.networkinfo);
 		try {
 			logWrite.write("执行sql：" + sente);
@@ -92,7 +77,7 @@ public class NetDatagram {
 			dBtool.executeUpdate(sente);
 			dBtool.free();
 		} catch (SQLException e) {
-			logWrite.write("【 Error!】NetDatagram.excuteNetDatagram：" + e.getMessage());
+			logWrite.write("excuteNetDatagram:" + e.getMessage());
 		}
 	}
 }

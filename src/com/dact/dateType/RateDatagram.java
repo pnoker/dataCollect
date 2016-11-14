@@ -5,13 +5,13 @@ import java.sql.SQLException;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.util.Sqlserver;
 import com.dact.util.LogWrite;
+import com.dact.util.Oracle;
 import com.dact.util.PackageProcessor;
 
 public class RateDatagram {
 	public void excuteRateDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
-		Sqlserver dBtool = new Sqlserver();
+		Oracle dBtool = new Oracle();
 		int count = p.bytesToInt(2, 2);
 		int receive_rate = 0;
 		String wia_longaddress = "", wia_shortaddress = "", sente = "";

@@ -100,7 +100,6 @@ public class ReceiverDatagram implements Runnable {
 		NetDatagram netDatagram = new NetDatagram();
 		HealthDatagram healthDatagram = new HealthDatagram();
 		Datagram datagram = new Datagram();
-		RateDatagram rateDatagram = new RateDatagram();
 		try {
 			datagramSocket.send(datagramSend);
 		} catch (IOException e) {
@@ -128,11 +127,6 @@ public class ReceiverDatagram implements Runnable {
 						logWrite.writeEasy("网络报文:", hexDatagram);
 						netDatagram.excuteNetDatagram(p, base, networkinfo, logWrite);
 						networkinfo = netDatagram.getNetworkinfo();
-						break;
-					case "0111":
-						logWrite.write("统计报文:" + hexDatagram);
-						logWrite.writeEasy("统计报文:", hexDatagram);
-						rateDatagram.excuteRateDatagram(p, base, logWrite);
 						break;
 					/* 节点测试信息 */
 					case "010f":

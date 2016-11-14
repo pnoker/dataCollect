@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.dact.pojo.MapInfo;
-import com.dact.util.Sqlserver;
 import com.dact.util.OperateTxtUtil;
+import com.dact.util.Oracle;
 
 public class Wireless {
 	public void initWireless() {
-		Sqlserver dBtool = new Sqlserver();
+		Oracle dBtool = new Oracle();
 		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
 		ArrayList<String> wirelessio = new ArrayList<String>();
 		wirelessio = operateTxtUtil.readLine("D:/sia/confiles/wirelessIO.txt");
@@ -23,8 +23,7 @@ public class Wireless {
 			MapInfo.wirelessio_map.put(address, table);
 			MapInfo.wirelessio_currentime.put(address, new Date());
 			if (!datatable.contains(table.split(",")[1] + "_data")) {
-				String sente = "create table " + table.split(",")[1]
-						+ "_data (serial int identity(1,1), typeserial nvarchar(50) ,tag int ,value float ,reachtime datetime)";
+				String sente = "create table " + table.split(",")[1] + "_data (serial int identity(1,1), typeserial nvarchar(50) ,tag int ,value float ,reachtime datetime)";
 				try {
 					dBtool.executeUpdate(sente);
 				} catch (SQLException e) {
