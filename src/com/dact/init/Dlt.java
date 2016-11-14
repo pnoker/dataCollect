@@ -7,7 +7,7 @@ import com.dact.pojo.MapInfo;
 import com.dact.util.OperateTxtUtil;
 
 public class Dlt {
-	public void initShui() {
+	public void initDlt() {
 		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
 		ArrayList<String> shuibiao = new ArrayList<String>();
 		shuibiao = operateTxtUtil.readLine("D:/sia/confiles/dlt.txt");

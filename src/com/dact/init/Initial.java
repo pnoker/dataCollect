@@ -8,5 +8,7 @@ public class Initial {
 		wireless.initWireless();
 		Shui shui = new Shui();
 		shui.initShui();
+		Dlt dlt = new Dlt();
+		dlt.initDlt();
 	}
 }
