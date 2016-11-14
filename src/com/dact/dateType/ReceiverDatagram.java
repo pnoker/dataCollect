@@ -5,15 +5,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
@@ -61,9 +59,6 @@ public class ReceiverDatagram implements Runnable {
 				for (Entry<String, Long> entry : firstTime.entrySet()) {
 					long interval = (second - entry.getValue()) / (1000 * 60);
 					logWrite.write("< ----网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
-					if (interval >= 5) {// 某个节点的健康报文时间间隔大于5分钟就打印出来
-						logWrite.write("< ----网关下节点:（长地址）" + entry.getKey() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
-					}
 					if (interval >= 10) {
 						logWrite.write("< ---- 设置 stop = true  ---->");
 						stop = true;
@@ -73,9 +68,6 @@ public class ReceiverDatagram implements Runnable {
 				try {
 					long interval = (second - MapInfo.gateway_currentime.get(base.getIpaddress())) / (1000 * 60);
 					logWrite.write("< ----网关:" + base.getIpaddress() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
-					if (interval >= 5) {// 网关的健康报文时间间隔大于5分钟就打印出来
-						logWrite.write("< ----网关:" + base.getIpaddress() + " ，本次健康报文时间间隔为" + interval + "分钟 ---->");
-					}
 					if (interval >= 10) {
 						logWrite.write("< ---- 设置 stop = true  ---->");
 						stop = true;
