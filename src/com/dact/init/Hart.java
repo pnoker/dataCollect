@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.dact.pojo.MapInfo;
-import com.dact.util.DBtool;
+import com.dact.util.Sqlserver;
 
 public class Hart {
 	public void init_hart() {
-		DBtool dbtool = new DBtool();
+		Sqlserver dbtool = new Sqlserver();
 		String[] tableArr = null;
 		ArrayList<String> tmp1 = (new DataTable()).init_datatable();
 		try {

@@ -22,8 +22,8 @@ public class RepairNumber {
 
 	public void repair() throws Exception {
 		logWrite.write("<---------开始，检测数据是否丢失--------->");
-		DBtool dBtool = new DBtool();
-		DBtool dBtool2 = new DBtool();
+		Sqlserver dBtool = new Sqlserver();
+		Sqlserver dBtool2 = new Sqlserver();
 		ResultSet rs = null;
 		DateUtil dateUtil = new DateUtil();
 		Map<String, String> config = null;

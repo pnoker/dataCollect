@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.util.DBtool;
+import com.dact.util.Sqlserver;
 import com.dact.util.DateUtil;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
@@ -48,7 +48,7 @@ public class NetDatagram {
 	 * 由于数据报文只有短地址，于是只能通过网络报文提供的对应关系确定设备
 	 */
 	public void excuteNetDatagram(PackageProcessor p, BaseInfo base, String networkinfo, LogWrite logWrite) {
-		DBtool dBtool = new DBtool();
+		Sqlserver dBtool = new Sqlserver();
 		PrintUtil printUtil = new PrintUtil();
 		DateUtil dateUtil = new DateUtil();
 		String wia_longaddress = "", wia_shortaddress = "", deviceType = "";

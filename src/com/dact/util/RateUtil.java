@@ -94,7 +94,7 @@ public class RateUtil {
 	}
 
 	public void updataRate(String wia_longaddress, int serial, float rate, int lose, LogWrite logWrite) {
-		DBtool dBtool = new DBtool();
+		Sqlserver dBtool = new Sqlserver();
 		/* 判断是否重复，如果数据库有就进行update操作，没有就进行insert操作 */
 		boolean isnew = true;
 		String sql = "select * from Adapter_server_final where longaddress = '" + wia_longaddress + "'";

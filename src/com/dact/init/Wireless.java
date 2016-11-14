@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.dact.pojo.MapInfo;
-import com.dact.util.DBtool;
+import com.dact.util.Sqlserver;
 import com.dact.util.OperateTxtUtil;
 
 public class Wireless {
 	public void initWireless() {
-		DBtool dBtool = new DBtool();
+		Sqlserver dBtool = new Sqlserver();
 		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
 		ArrayList<String> wirelessio = new ArrayList<String>();
 		wirelessio = operateTxtUtil.readLine("D:/sia/confiles/wirelessIO.txt");

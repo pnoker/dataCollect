@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.util.DBtool;
+import com.dact.util.Sqlserver;
 import com.dact.util.DateUtil;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
@@ -24,7 +24,7 @@ public class HealthDatagram {
 	 */
 	public boolean excuteHealthDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		boolean updata = false;
-		DBtool dBtool = new DBtool();
+		Sqlserver dBtool = new Sqlserver();
 		DateUtil dateUtil = new DateUtil();
 		String shortAddress = p.bytesToString(2, 3);
 		/* 短地址为0100，表示是该网关的健康报文 */

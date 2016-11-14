@@ -6,16 +6,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DBtool {
+public class Oracle {
+	public static String user = "aqsh";
+	public static String pwd = "aqsh";
+	
 	private Connection connection = null;
 	public Statement statement = null;
 	private ResultSet result = null;
 
-	public DBtool() {
+	public Oracle() {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua;user=sa;password=yangfan";
-			connection = DriverManager.getConnection(url);
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			String url = "jdbc:oracle:thin:@221.180.150.131:8008:xywdb11";
+			connection = DriverManager.getConnection(url,user,pwd);
 			statement = connection.createStatement();
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
@@ -55,6 +58,10 @@ public class DBtool {
 		} catch (SQLException se) {
 			System.out.println("ERROR:" + se.getMessage());
 		}
+	}
+	public static void main(String[] args) {
+		Oracle oracle = new Oracle();
+		
 	}
 
 }
