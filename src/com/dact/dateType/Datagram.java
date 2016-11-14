@@ -74,11 +74,6 @@ public class Datagram {
 					} else if (shuiInfo.equals("sia0007")) {
 						shuiliuliang += 608;
 					}
-					// with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE())
-					// as hours,value from [shui_opc] where typeserial =
-					// 'sia0006') update [shui_opc] set value = (select
-					// (3290.0-table1.value)/table1.hours from table1) where
-					// typeserial = 'sia0006_0' and tag = 0
 					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '" + shuiInfo + "') ";
 					sente += "update [shui_opc] set value = (select (" + shuiliuliang + "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo + "_0' and tag = 0";
 					logWrite.write("更新当前数据库表shui_opc中的瞬时值：" + shuiInfo + "=" + shuiliuliang);
