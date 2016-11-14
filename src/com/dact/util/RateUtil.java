@@ -77,15 +77,18 @@ public class RateUtil {
 		if (begin == serial) {
 			rate = 100;
 		} else {
-			rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
+			try {
+				rate = ((float) num / ((float) serial - (float) begin + 1)) * 100;
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
 		}
 		if (rate > 100) {
 			rate = 100;
 		}
 		int total = serial - begin + 1;
 		logWrite.write("总计，丢包个数为：" + lose_total);
-		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = "
-				+ rate + " %");
+		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = " + rate + " %");
 
 		updataRate(wia_longaddress, serial, rate, lose_total, logWrite);
 	}
@@ -103,12 +106,11 @@ public class RateUtil {
 		} catch (SQLException e) {
 			logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 		}
-		if(wia_longaddress.equals("null")){
+		if (wia_longaddress.equals("null")) {
 			isnew = false;
 		}
 		if (isnew) {
-			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
-					+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
@@ -116,8 +118,7 @@ public class RateUtil {
 				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 			}
 		} else {
-			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
-					+ rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
+			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
