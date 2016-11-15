@@ -17,8 +17,8 @@ public class OperateTxtUtil {
 	public ArrayList<String> readLine(String path) {
 		ArrayList<String> line = new ArrayList<String>();
 		try {
-			FileInputStream file = new FileInputStream(path);
-			InputStreamReader fileReader = new InputStreamReader(file, "utf-8");
+			FileInputStream fileInputStream = new FileInputStream(path);
+			InputStreamReader fileReader = new InputStreamReader(fileInputStream, "utf-8");
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			String temp;
 			while ((temp = bufferedReader.readLine()) != null) {
