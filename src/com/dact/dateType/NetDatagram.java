@@ -84,15 +84,18 @@ public class NetDatagram {
 			this.networkinfo = networkinfo + wia_longaddress + ",";
 			this.networkinfo = noRepeat(this.networkinfo);
 		}
-		String sente = "update [Network_tuopu] set manydevices = '" + this.networkinfo + "' where ipaddress = '" + base.getIpaddress() + "'";
+		/*
+		 * String sente = "update [Network_tuopu] set manydevices = '" +
+		 * this.networkinfo + "' where ipaddress = '" + base.getIpaddress() +
+		 * "'";
+		 */
 		logWrite.write("更新网关的网络拓扑信息为：" + this.networkinfo);
-		try {
-			logWrite.write("执行sql：" + sente);
-			printUtil.printDetail(base.getIpaddress(), "执行sql：" + sente);
-			dBtool.executeUpdate(sente);
-			dBtool.free();
-		} catch (SQLException e) {
-			logWrite.write("【 Error!】NetDatagram.excuteNetDatagram：" + e.getMessage());
-		}
+		/*
+		 * try { logWrite.write("执行sql：" + sente);
+		 * printUtil.printDetail(base.getIpaddress(), "执行sql：" + sente);
+		 * dBtool.executeUpdate(sente); dBtool.free(); } catch (SQLException e)
+		 * { logWrite.write("【 Error!】NetDatagram.excuteNetDatagram：" +
+		 * e.getMessage()); }
+		 */
 	}
 }
