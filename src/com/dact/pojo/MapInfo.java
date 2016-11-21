@@ -13,6 +13,7 @@ public class MapInfo {
 	public static Map<String, String> ai_map = new HashMap<String, String>();
 	public static Map<String, String> shui_map = new HashMap<String, String>();
 	public static Map<String, String> pi_map = new HashMap<String, String>();
+	public static Map<String, String> dlt_map = new HashMap<String, String>();
 	// 位号map
 	public static Map<String, String> weihao_map = new HashMap<String, String>();
 	public static Map<String, Long> gateway_currentime = new HashMap<String, Long>();
@@ -20,6 +21,7 @@ public class MapInfo {
 	public static Map<String, Date> hart_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> ai_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> pi_currentime = new HashMap<String, Date>();
+	public static Map<String, Date> dlt_currentime = new HashMap<String, Date>();
 	public static Map<String, Date> shui_currentime = new HashMap<String, Date>();
 
 	// 超时重连
