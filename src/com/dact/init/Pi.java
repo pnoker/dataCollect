@@ -1,28 +1,19 @@
 package com.dact.init;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.dact.pojo.MapInfo;
+import com.dact.util.OperateTxtUtil;
 
 public class Pi {
-	public void init_pi() {
-		try {
-			BufferedReader bw = new BufferedReader(new FileReader(new File("D:\\sia\\confiles\\pi.txt")));
-			String line = null;
-			while ((line = bw.readLine()) != null) {
-				String[] lineArr = line.split("\\t");
-				MapInfo.pi_map.put(lineArr[0], lineArr[1]);
-				Date date = new Date();
-				System.out.println(date);
-				MapInfo.pi_currentime.put(lineArr[0], date);
-
-			}
-			bw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void initPi() {
+		OperateTxtUtil operateTxtUtil = new OperateTxtUtil();
+		ArrayList<String> pi = new ArrayList<String>();
+		pi = operateTxtUtil.readLine("D:/sia/confiles/pi.txt");
+		for (int m = 0; m < pi.size(); m++) {
+			MapInfo.pi_map.put(pi.get(m).split("\\t")[0], pi.get(m).split("\\t")[1]);
+			MapInfo.pi_currentime.put(pi.get(m).split("\\t")[0], new Date());
 		}
 	}
 }
