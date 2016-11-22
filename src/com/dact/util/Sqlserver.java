@@ -14,7 +14,7 @@ public class Sqlserver {
 	public Sqlserver() {
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua;user=sa;password=yangfan";
+			String url = "jdbc:sqlserver://localhost:1433;databaseName=ShiHua-BeiJing;user=sa;password=yangfan";
 			connection = DriverManager.getConnection(url);
 			statement = connection.createStatement();
 		} catch (SQLException ex) {
