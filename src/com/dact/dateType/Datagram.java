@@ -1,15 +1,14 @@
 package com.dact.dateType;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
-import com.dact.util.Sqlserver;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
 import com.dact.util.RateUtil;
+import com.dact.util.Sqlserver;
 
 public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
@@ -36,7 +35,7 @@ public class Datagram {
 			if (p.bytesToString(10, 10).equals("01")) {
 				/* 水表 */
 				if (deviceType.equals("0e00")) {
-					logWrite.write("水表");
+					logWrite.write("该条数据为水表数据");
 					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
@@ -51,50 +50,10 @@ public class Datagram {
 						logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 					}
 
-					sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "_bt' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的表头值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.2：" + e.getMessage());
-					}
-					if (shuiInfo.equals("sia0001")) {
-						shuiliuliang += 42959;
-					} else if (shuiInfo.equals("sia0002")) {
-						shuiliuliang += 44165;
-					} else if (shuiInfo.equals("sia0003")) {
-						shuiliuliang += 1696.7;
-					} else if (shuiInfo.equals("sia0004")) {
-						shuiliuliang += 1821;
-					} else if (shuiInfo.equals("sia0005")) {
-						shuiliuliang += 357.6;
-					} else if (shuiInfo.equals("sia0006")) {
-						shuiliuliang += 3280;
-					} else if (shuiInfo.equals("sia0007")) {
-						shuiliuliang += 608;
-					}
-					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '" + shuiInfo + "') ";
-					sente += "update [shui_opc] set value = (select (" + shuiliuliang + "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo + "_0' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的瞬时值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.3：" + e.getMessage());
-					}
-					sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的累计值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.4：" + e.getMessage());
-					}
 				}
 				/* 无线表 */
 				else {
-					logWrite.write("无线表");
+					logWrite.write("该条数据为modbus数据");
 					String slaveID = null;
 					/* 从站地址 */
 					slaveID = p.bytesToString(11, 11);
@@ -108,49 +67,48 @@ public class Datagram {
 						currentime = new Date();
 						interval = getIntervalSeconds(lastime, currentime);
 
-						if (interval >= 30) {
+						if (interval >= 1800) {
+							System.out.println("3分钟才存储一个modbus数据");
 							MapInfo.wirelessio_currentime.put(wia_longaddress, currentime);
 							infoArr = MapInfo.wirelessio_map.get(wia_longaddress).split(",");
 							String sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0] + "',";
+							String updatesente = "update [value_opc] set liuliang =";
 							for (int i = 2; i < infoArr.length; i++) {
-
 								eachArr = infoArr[i].split(" ");
-								if (eachArr[3].contains("int")) {
-									float tep_int = p.bytesToFloat(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
-									sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "'," + (i - 2) + "," + tep_int + ",getdate())";
-									logWrite.write("向数据库表" + infoArr[1] + "_data中添加一条数据：" + infoArr[0] + "=" + tep_int);
-									try {
-										logWrite.write("执行sql：" + sente);
-										dBtool.executeUpdate(sente);
-									} catch (SQLException e) {
-										logWrite.write("【 Error!】Datagram.excuteDatagram.5：" + e.getMessage());
-									}
-								}
-								if (eachArr[3].contains("long")) {
-									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
-									if (i - 2 == 0) {
-										tep_int = (long) (tep_int * 0.0000001);
-									} else if (i - 2 == 1) {
-										tep_int = (long) (tep_int * 0.1);
-									} else {
-									}
-									sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "'," + (i - 2) + "," + tep_int + ",getdate())";
-									try {
-										logWrite.write("执行sql：" + sente);
-										dBtool.executeUpdate(sente);
-									} catch (SQLException e) {
-										logWrite.write("【 Error!】Datagram.excuteDatagram.6：" + e.getMessage());
-									}
-									sente = "update [shui_opc] set value = " + tep_int + ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_" + (i - 2) + "'";
-									try {
-										logWrite.write("执行sql：" + sente);
-										dBtool.executeUpdate(sente);
-									} catch (SQLException e) {
-										logWrite.write("【 Error!】Datagram.excuteDatagram.7：" + e.getMessage());
-									}
+								if (eachArr[3].contains("int") && (p.bytesToString(13, 14).equals("8581"))) {
+									int tep_int = p.bytesToInt(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = sente + "" + tep_int + ",";
+									updatesente += tep_int;
+								} else if ((eachArr[3].contains("int")) && (p.bytesToString(13, 14).equals("0800"))) {
+									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
+								} else if (eachArr[3].contains("int")) {
+									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
+								} else if (eachArr[3].contains("float")) {
+									float tep_float = p.bytesToFloat3(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
+								} else if (eachArr[3].contains("int01")) {
+									float tep_float = p.bytesToInt(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
 								}
 							}
+							sente = sente + "getdate())";
+							updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+							try {
+								logWrite.write("执行sql：" + sente);
+								dBtool.executeUpdate(sente);
+								logWrite.write("执行sql：" + updatesente);
+								dBtool.executeUpdate(updatesente);
+							} catch (SQLException e) {
+								logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+							}
 						}
+
 					}
 				}
 			}
@@ -303,7 +261,6 @@ public class Datagram {
 		else {
 			logWrite.write("hart类型数据");
 			rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
-
 			int i = 8;
 			int sure = 0;
 			boolean flag = true;
