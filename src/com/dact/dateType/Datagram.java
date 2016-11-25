@@ -31,7 +31,6 @@ public class Datagram {
 		if (p.bytesToString(8, 9).equals("7400")) {
 			if (p.bytesToString(10, 10).equals("01")) {
 				logWrite.write("水表");
-				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 				shuiliuliang = p.bytesToFloatSmall(11, 14);
@@ -46,7 +45,6 @@ public class Datagram {
 				}
 			} else if (p.bytesToString(10, 10).equals("00")) {
 				logWrite.write("Hart表");
-				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 				shuiliuliang = p.bytesToFloatSmall(11, 14);
@@ -61,8 +59,6 @@ public class Datagram {
 				}
 			} else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("无线IO变送器数据");
-				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
-
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 				shuiliuliang = p.bytesToFloatSmall(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
@@ -109,7 +105,7 @@ public class Datagram {
 			} else if (p.bytesToString(10, 10).equals("12")) {
 				logWrite.write("12数据 ");
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
