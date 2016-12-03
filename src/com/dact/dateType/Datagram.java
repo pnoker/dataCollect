@@ -33,7 +33,7 @@ public class Datagram {
 				logWrite.write("水表");
 
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial,value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
@@ -43,11 +43,11 @@ public class Datagram {
 				} catch (SQLException e) {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 				}
-			} else if (p.bytesToString(10, 10).equals("00")) {
-				logWrite.write("Hart表");
+			} else if (p.bytesToString(10, 10).equals("02")) {
+				logWrite.write("水表");
 
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
@@ -57,10 +57,27 @@ public class Datagram {
 				} catch (SQLException e) {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 				}
+			} else if (p.bytesToString(10, 10).equals("00")) {
+				logWrite.write("压力表");
+				if (p.bytesToString(18, 19).equals("0000")) {
+					logWrite.write("常规数据");
+					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
+					shuiliuliang = p.bytesToFloat(26, 29);
+					logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
+					String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
+					logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
+					try {
+						logWrite.write("执行sql：" + sente);
+						dBtool.executeUpdate(sente);
+					} catch (SQLException e) {
+						logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+					}
+				}
 			} else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("无线IO变送器数据");
+
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
@@ -78,7 +95,7 @@ public class Datagram {
 			if (p.bytesToString(10, 10).equals("06")) {
 				logWrite.write("06数据 ");
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
@@ -91,7 +108,7 @@ public class Datagram {
 			} else if (p.bytesToString(10, 10).equals("08")) {
 				logWrite.write("08数据 ");
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
@@ -123,7 +140,7 @@ public class Datagram {
 			if (p.bytesToString(10, 10).equals("00")) {
 				logWrite.write("00数据 ");
 				shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-				shuiliuliang = p.bytesToFloatSmall(11, 14);
+				shuiliuliang = p.bytesToFloat(11, 14);
 				logWrite.write("数据：" + shuiInfo + "=" + shuiliuliang);
 				String sente = "insert into [collect_data](typeserial, value,reachtime)values('" + shuiInfo + "'," + shuiliuliang + ",getdate())";
 				logWrite.write("向数据库表collect_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
