@@ -24,8 +24,6 @@ public class HealthDatagram {
 	 */
 	public boolean excuteHealthDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		boolean updata = false;
-		Sqlserver dBtool = new Sqlserver();
-		DateUtil dateUtil = new DateUtil();
 		String shortAddress = p.bytesToString(2, 3);
 		/* 短地址为0100，表示是该网关的健康报文 */
 		if (shortAddress.equals("0100")) {

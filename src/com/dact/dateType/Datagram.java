@@ -1,6 +1,8 @@
 package com.dact.dateType;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.dact.pojo.BaseInfo;
@@ -13,13 +15,29 @@ import com.dact.util.Sqlserver;
 public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		Sqlserver dBtool = new Sqlserver();
+		ResultSet rs = null;
 		RateUtil rateUtil = new RateUtil();
-		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, hartaddress = "";
+		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, dltInfo, aiInfo, piInfo, hartaddress = "";
 		String[] infoArr, eachArr;
 		int interval = 0, serial;
-		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0;
+		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0, zerochannel = 0, onechannel = 0, pivalue;
 		Date lastime, currentime;
+		Date currentime_eight = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd H:m:s");
+		SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd H:m:s");
+		try {
+			String eight_str = format.format(currentime_eight);
+			String[] eight_arr = eight_str.split(" ");
+			eight_arr[1] = "08:00:00";
+			StringBuffer sb = new StringBuffer();
+			sb.append(eight_arr[0] + " ");
+			sb.append(eight_arr[1]);
+			String eight_after = sb.toString();
+			currentime_eight = format2.parse(eight_after);
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		wia_shortaddress = p.bytesToString(2, 3);
 		wia_longaddress = MapInfo.addressmap.get(wia_shortaddress + " " + base.getIpaddress());
 		deviceType = MapInfo.typemap.get(wia_longaddress);
@@ -115,146 +133,172 @@ public class Datagram {
 			/* AI数据类型，02 */
 			else if (p.bytesToString(10, 10).equals("02")) {
 				logWrite.write("AI数据类型");
-				if (deviceType.equals("0e00")) {
-					logWrite.write("设备类型为，0e00，水表");
-					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
-
-					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-					int dianya_tmp = p.doublebytesToInt(11, 12);
-					dianya = (float) dianya_tmp / 100;
-					logWrite.write("水表电压数据：" + shuiInfo + "=" + dianya);
-
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
+				lastime = MapInfo.ai_currentime.get(wia_longaddress);
+				currentime = new Date();
+				interval = getIntervalSeconds(lastime, currentime);
+				if (interval > 30) {
+					aiInfo = MapInfo.ai_map.get(wia_longaddress);
+					if (p.bytesToString(10, 10).equals("01")) {
+						zerochannel = p.bytesToFloat3(12, 15);
+						onechannel = 0;
+					} else if (p.bytesToString(10, 10).equals("02")) {
+						onechannel = p.bytesToFloat3(12, 15);
+						zerochannel = 0;
+					} else if (p.bytesToString(10, 10).equals("03")) {
+						zerochannel = p.bytesToFloat3(12, 15);
+						onechannel = p.bytesToFloat3(17, 20);
+					}
+					String sente = "insert into [ai_data]values('" + aiInfo + "','" + zerochannel + "','" + onechannel + "',getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
 					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.8：" + e.getMessage());
+						logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 					}
-				} else if (deviceType.equals("0c00")) {
-					logWrite.write("设备类型为，0c00，无线表");
-					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
 
-					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
-					int dianya_tmp = p.doublebytesToInt(11, 12);
-					float tem1 = p.bytesToFloatSmall(12, 15);
-					float tem2 = p.bytesToFloatSmall(17, 20);
-					dianya = (float) dianya_tmp / 100;
-					logWrite.write("通道0数据，温度数据：" + shuiInfo + "=" + tem1);
-					logWrite.write("通道1数据，温度数据：" + shuiInfo + "=" + tem2);
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.8：" + e.getMessage());
-					}
-				}
-
-			}
-			/* 开润开封数据类型 */
-			else if (p.bytesToString(10, 10).equals("07")) {
-				logWrite.write("开润开封数据类型");
-				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
-
-				String runInfo = MapInfo.shui_map.get(wia_longaddress);
-				if (runInfo == null) {
-
-				}
-				int tag = p.bytesToInt(12, 12);
-				float kairun = 0;
-				int d0 = 0, d1 = 0, d2 = 0, d3 = 0, d4 = 0;
-
-				switch (tag) {
-				case 0:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-					d2 = p.bytesToTen(15, 15);
-					d3 = p.bytesToTen(16, 16);
-
-					kairun = d2 * 10000 + d1 * 100 + d0;
-					for (int i = 0; i < d3 - 5; i++) {
-						kairun = (float) (kairun * 0.1);
-					}
-					logWrite.write("流量：" + kairun);
-					break;
-				case 1:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-					d2 = p.bytesToTen(15, 15);
-
-					kairun = d2 * 10000 + d1 * 100 + d0;
-					logWrite.write("流速：" + kairun);
-					break;
-				case 2:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-
-					kairun = d1 * 100 + d0;
-					logWrite.write("流量百分比：" + kairun);
-					break;
-				case 3:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-
-					kairun = d1 * 100 + d0;
-					logWrite.write("流体电阻值：" + kairun);
-					break;
-				case 4:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-					d2 = p.bytesToTen(15, 15);
-					d3 = p.bytesToTen(16, 16);
-					d4 = p.bytesToTen(17, 17);
-					kairun = d4 * 1000000 + d3 * 1000000 + d2 * 10000 + d1 * 100 + d0;
-					logWrite.write("正向总量：" + kairun);
-					break;
-				case 5:
-					d0 = p.bytesToTen(13, 13);
-					d1 = p.bytesToTen(14, 14);
-					d2 = p.bytesToTen(15, 15);
-					d3 = p.bytesToTen(16, 16);
-					d4 = p.bytesToTen(17, 17);
-
-					kairun = d4 * 1000000 + d3 * 1000000 + d2 * 10000 + d1 * 100 + d0;
-					logWrite.write("反向总量：" + kairun);
-					break;
-				case 6:
-					logWrite.write("报警状态：" + kairun);
-					break;
-				case 7:
-					logWrite.write("管道直径：" + kairun);
-					break;
-
-				default:
-					logWrite.write("没有符合任何命令：" + kairun);
-					break;
-				}
-
-				String sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "'," + tag + "," + kairun + ",getdate())";
-				try {
-					logWrite.write("执行sql：" + sente);
-					dBtool.executeUpdate(sente);
-				} catch (SQLException e) {
-					logWrite.write("【 Error!】Datagram.excuteDatagram.9：" + e.getMessage());
-				}
-
-				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '" + runInfo + "_" + tag + "'";
-				try {
-					logWrite.write("执行sql：" + sente);
-					dBtool.executeUpdate(sente);
-				} catch (SQLException e) {
-					logWrite.write("【 Error!】Datagram.excuteDatagram.10：" + e.getMessage());
 				}
 			}
 			/* PI数据类型，04 */
 			else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("PI数据类型");
 				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
+				lastime = MapInfo.pi_currentime.get(wia_longaddress);
+				if (lastime != null) {
+					currentime = new Date();
+					interval = getIntervalSeconds(lastime, currentime);
+					System.out.println("AI当前的时间间隔到底是什么" + interval);
+					if (interval > 30) {
+
+						piInfo = MapInfo.pi_map.get(wia_longaddress);
+
+						pivalue = p.bytesToFloatSmall(11, 14);
+						String sente = "insert into [pi_data]values('" + piInfo + "'," + pivalue + ",getdate())";
+						try {
+							logWrite.write("执行sql：" + sente);
+							dBtool.executeUpdate(sente);
+						} catch (SQLException e) {
+							logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+						}
+					}
+				}
 			}
 			/* DLT数据类型 */
 			else if (p.bytesToString(10, 10).equals("03")) {
 				logWrite.write("DLT数据类型 ");
+
+				System.out.println("这条数据是DLT数据：");
+
+				int sure_dlt = 0;
+				boolean flag_dlt = true;
+				int i_dlt = 11;
+				while (flag_dlt) {
+					if (p.bytesToString(i_dlt, i_dlt).equals("68")) {
+						sure_dlt = i_dlt;
+						flag_dlt = false;
+					}
+					i_dlt++;
+
+				}
+
+				System.out.println("sure_dlt:" + sure_dlt);
+
+				int dataLength = Integer.parseInt(p.bytesToString(sure_dlt + 9, sure_dlt + 9), 16);
+				System.out.println("dataLength:" + dataLength);
+				String dltFlag = p.bytesToString(sure_dlt + 1, sure_dlt + 6);
+				System.out.println("dltFlag:" + dltFlag);
+				int index = -1;
+				dltInfo = MapInfo.dlt_map.get(wia_longaddress);
+				System.out.println("dltInfo:" + dltInfo);
+				if (dltInfo != null) {
+					index = dltInfo.indexOf(dltFlag);
+				}
+				if (index != -1) {
+					int nameIndex = dltInfo.indexOf(" ", index);
+					int typeIndex = dltInfo.indexOf(" ", nameIndex + 1);
+					String dltName = dltInfo.substring(nameIndex + 1, typeIndex);
+					String type = dltInfo.substring(typeIndex + 1, typeIndex + 3);
+
+					int typeLength = 0;
+					if (type.equals("07")) {
+						typeLength = 4;
+						System.out.println("07规约");
+					} else if (type.equals("97")) {
+						typeLength = 2;
+						System.out.println("97规约");
+					}
+
+					String dataPart = p.bytesToString(sure_dlt + 10, sure_dlt + 10 + dataLength - 1);
+					System.out.println("dataPart:" + dataPart);
+					String flagPart = p.bytesToString(sure_dlt + 10, sure_dlt + typeLength + 9);
+					System.out.println("flagPart:" + flagPart);
+					String valuePart = p.bytesToString(sure_dlt + typeLength + 10, sure_dlt + 10 + dataLength - 1);
+					System.out.println("valuePart:" + valuePart);
+
+					long x = 0;
+					long y = 0;
+					boolean save = true;
+
+					float result = 0;
+
+					int valueLength = dataLength - typeLength;
+					System.out.println("valueLength:" + valueLength);
+
+					for (int i = 0, j = -2; i < valueLength * 2; i += 2, j += 2) {
+						String part = valuePart.substring(i, i + 2);
+						System.out.println("part:" + part);
+						x = Long.parseLong(part, 16);
+						y = Long.parseLong("33", 16);
+						try {
+							Long trueValue = Long.parseLong(Long.toHexString(x - y));
+							System.out.println("i:" + i + ",j:" + j + ",trueValue:" + trueValue);
+							result += trueValue * Math.pow(10, j);
+						} catch (Exception e) {
+							System.out.println("规约设置错误");
+							save = false;
+						}
+					}
+
+					if (save) {
+						String sente = "insert into ele_data values('" + dltName + "'," + result + ",getdate(),'" + flagPart + "')";
+						String updatesente = "update [ele_opc] set value = " + result + ",reachtime = getdate() where typeserial = '" + dltName + "' and flag = '" + flagPart + "'";
+						String select_sente = "select  * from [anqingcollect].[dbo].[ele_opc] where typeserial = '" + dltName + "' and flag = '" + flagPart + "'";
+						try {
+							rs = dBtool.executeQuery(select_sente);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+						Date temp = new Date();
+						Date current_temp = new Date();
+						int interval_temp = 0;
+						try {
+							while (rs.next()) {
+								temp = rs.getTimestamp("reachtime");
+								interval_temp = getIntervalSeconds(temp, current_temp);
+							}
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+
+						int interval_temp_eight = getIntervalSeconds(currentime_eight, current_temp);
+						System.out.println("系统最后一次上数" + temp);
+						System.out.println("现在" + current_temp);
+						System.out.println("电表间隔值" + interval_temp);
+						if ((interval_temp > 25 * 60)) {
+							System.out.println("3分钟才存储一个电表数据");
+							try {
+								logWrite.write("执行sql：" + sente);
+								dBtool.executeUpdate(sente);
+								logWrite.write("执行sql：" + updatesente);
+								dBtool.executeUpdate(updatesente);
+							} catch (SQLException e) {
+								logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+							}
+						}
+
+					}
+				} else {
+					System.out.println("配置文件中找不到从栈地址");
+				}
 			}
 		}
 		/* hart类型数据 */

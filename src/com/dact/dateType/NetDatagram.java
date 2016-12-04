@@ -52,11 +52,6 @@ public class NetDatagram {
 		PrintUtil printUtil = new PrintUtil();
 		DateUtil dateUtil = new DateUtil();
 		String wia_longaddress = "", wia_shortaddress = "", deviceType = "";
-		/*
-		 * 网络报文:01 01/43 29 00 00 00 41 7A 00/11 00/0E 00/04/01/00 00/0C 00/0D
-		 * 00/01/01
-		 * 00/0E00/FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00/9A 6C
-		 */
 		wia_longaddress = p.bytesToString(2, 9);
 		wia_shortaddress = p.bytesToString(10, 11);
 
@@ -69,13 +64,6 @@ public class NetDatagram {
 		logWrite.write("邻居个数：" + neighbor);
 		logWrite.write("设备类型：" + deviceType);
 
-		/*
-		 * Iterator<Entry<String, String>> iterator =
-		 * MapInfo.addressmap.entrySet().iterator(); while (iterator.hasNext())
-		 * { Entry<String, String> entry = iterator.next(); String longaddress =
-		 * entry.getValue(); if (wia_longaddress.equals(longaddress)) {
-		 * iterator.remove(); } }
-		 */
 
 		MapInfo.addressmap.put(wia_shortaddress + " " + base.getIpaddress(), wia_longaddress);
 		MapInfo.typemap.put(wia_longaddress, deviceType);
