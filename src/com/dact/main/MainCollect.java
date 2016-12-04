@@ -37,20 +37,5 @@ public class MainCollect {
 				System.out.println(e.getMessage());
 			}
 		}
-		System.out.println("<---开启补数程序--->");
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				RepairNumber repairNumber = new RepairNumber();
-				try {
-					repairNumber.repair();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		}, 1000 * 30, 1000 * 60 * 5);
-
 	}
 }
