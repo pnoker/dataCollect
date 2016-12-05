@@ -397,7 +397,7 @@ public class Datagram {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
-								logWrite.write("【 Error!】Datagram.excuteDatagram.17：" + e.getMessage());
+								logWrite.write( e.getMessage());
 							}
 							getdate = getInitialTime(infoArr[1], infoArr[0]);
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',2," + thirdvalue + ",'" + getdate + "')";
@@ -405,7 +405,7 @@ public class Datagram {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
-								logWrite.write("【 Error!】Datagram.excuteDatagram.18：" + e.getMessage());
+								logWrite.write(e.getMessage());
 							}
 							getdate = getInitialTime(infoArr[1], infoArr[0]);
 							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',3,'" + fourthvalue + "','" + getdate + "')";
@@ -413,7 +413,7 @@ public class Datagram {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
-								logWrite.write("【 Error!】Datagram.excuteDatagram.19：" + e.getMessage());
+								logWrite.write(e.getMessage());
 							}
 						}
 					}
