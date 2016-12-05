@@ -1,5 +1,6 @@
 package com.dact.dateType;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -26,16 +27,68 @@ public class HealthDatagram {
 		boolean updata = false;
 		Sqlserver dBtool = new Sqlserver();
 		DateUtil dateUtil = new DateUtil();
+		String sql = "";
 		String shortAddress = p.bytesToString(2, 3);
 		/* 短地址为0100，表示是该网关的健康报文 */
 		if (shortAddress.equals("0100")) {
+			boolean isnew = true;
 			MapInfo.gateway_currentime.put(base.getIpaddress(), (new Date()).getTime());
+			sql = "select * from health where type = '网关' and name = '"+base.getIpaddress()+"'";
+			try {
+				ResultSet rs = dBtool.executeQuery(sql);
+				while (rs.next()) {
+					isnew = false;
+				}
+			} catch (SQLException e) {
+				logWrite.write(e.getMessage());
+			}
+			if (isnew) {
+				sql = "insert into health (name,type,signal,reachtime) values ('" + base.getIpaddress() + "','网关',100,getdate())";
+				try {
+					dBtool.executeUpdate(sql);
+				} catch (SQLException e) {
+					logWrite.write(e.getMessage());
+				}
+			} else {
+				sql = "update health set signal = 100 ,reachtime = getdate() where name = '" + base.getIpaddress() + "' and type = '网关'";
+				try {
+					dBtool.executeUpdate(sql);
+				} catch (SQLException e) {
+					logWrite.write(e.getMessage());
+				}
+			}
 		} else if (shortAddress.equals("0000")) {
 			// 备用短地址，不做任何操作
 		} else {// 其他短地址，即：节点的短地址
 			String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
 			if (longAddress != null) {// 长地址不为空
+				boolean isnew = true;
+				int signal = p.bytesToInt(4, 5);
 				logWrite.write("长地址和短地址对应关系---> " + longAddress + " -> " + shortAddress);
+				sql = "select * from health where type = '适配器' and name = '"+longAddress+"'";
+				try {
+					ResultSet rs = dBtool.executeQuery(sql);
+					while (rs.next()) {
+						isnew = false;
+					}
+				} catch (SQLException e) {
+					logWrite.write(e.getMessage());
+				}
+				if (isnew) {
+					sql = "insert into health (name,type,signal,reachtime) values ('" + longAddress + "','适配器',"+signal+",getdate())";
+					try {
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write(e.getMessage());
+					}
+				} else {
+					sql = "update health set signal = "+signal+" ,reachtime = getdate() where name = '" + longAddress + "' and type = '适配器'";
+					try {
+						dBtool.executeUpdate(sql);
+					} catch (SQLException e) {
+						logWrite.write(e.getMessage());
+					}
+				}
 				updata = true;
 			}
 		}
