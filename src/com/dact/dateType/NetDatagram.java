@@ -81,7 +81,7 @@ public class NetDatagram {
 		MapInfo.typemap.put(wia_longaddress, deviceType);
 
 		if (!((wia_shortaddress.equals("0100")) || (wia_shortaddress.equals("0000")) || (wia_longaddress.equals("007a410000000a7e")) || (wia_longaddress.equals("e025000000417a00"))
-				|| (wia_longaddress.equals("0326000000417a00")))) {
+				|| (wia_longaddress.equals("0326000000417a00"))|| (wia_longaddress.equals("d225000000417a00")))) {
 			this.networkinfo = networkinfo + wia_longaddress + ",";
 			this.networkinfo = noRepeat(this.networkinfo);
 		}
