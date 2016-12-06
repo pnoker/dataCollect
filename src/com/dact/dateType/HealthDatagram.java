@@ -33,7 +33,7 @@ public class HealthDatagram {
 		if (shortAddress.equals("0100")) {
 			boolean isnew = true;
 			MapInfo.gateway_currentime.put(base.getIpaddress(), (new Date()).getTime());
-			sql = "select * from health where type = '网关' and name = '"+base.getIpaddress()+"'";
+			sql = "select * from health where type = '网关' and name = '" + base.getIpaddress() + "'";
 			try {
 				ResultSet rs = dBtool.executeQuery(sql);
 				while (rs.next()) {
@@ -61,11 +61,17 @@ public class HealthDatagram {
 			// 备用短地址，不做任何操作
 		} else {// 其他短地址，即：节点的短地址
 			String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
+			if ((longAddress.equals("007a410000000a7e")) || (longAddress.equals("e025000000417a00")) || (longAddress.equals("0326000000417a00"))) {
+				longAddress = null;
+			}
 			if (longAddress != null) {// 长地址不为空
 				boolean isnew = true;
-				int signal = p.bytesToInt(4, 5);
+				int signal = p.bytesToInt(5, 5);
+				if (signal > 127) {
+					signal = 127 - signal;
+				}
 				logWrite.write("长地址和短地址对应关系---> " + longAddress + " -> " + shortAddress);
-				sql = "select * from health where type = '适配器' and name = '"+longAddress+"'";
+				sql = "select * from health where type = '适配器' and name = '" + longAddress + "'";
 				try {
 					ResultSet rs = dBtool.executeQuery(sql);
 					while (rs.next()) {
@@ -75,14 +81,14 @@ public class HealthDatagram {
 					logWrite.write(e.getMessage());
 				}
 				if (isnew) {
-					sql = "insert into health (name,type,signal,reachtime) values ('" + longAddress + "','适配器',"+signal+",getdate())";
+					sql = "insert into health (name,type,signal,reachtime) values ('" + longAddress + "','适配器'," + signal + ",getdate())";
 					try {
 						dBtool.executeUpdate(sql);
 					} catch (SQLException e) {
 						logWrite.write(e.getMessage());
 					}
 				} else {
-					sql = "update health set signal = "+signal+" ,reachtime = getdate() where name = '" + longAddress + "' and type = '适配器'";
+					sql = "update health set signal = " + signal + " ,reachtime = getdate() where name = '" + longAddress + "' and type = '适配器'";
 					try {
 						dBtool.executeUpdate(sql);
 					} catch (SQLException e) {
