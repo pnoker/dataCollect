@@ -43,7 +43,7 @@ public class HealthDatagram {
 				logWrite.write(e.getMessage());
 			}
 			if (isnew) {
-				sql = "insert into health (name,type,signal,reachtime) values ('" + base.getIpaddress() + "','网关',100,getdate())";
+				sql = "insert into health (name,type,signal,reachtime) values ('" + base.getIpaddress() + "','网关',36,getdate())";
 				try {
 					dBtool.executeUpdate(sql);
 				} catch (SQLException e) {
