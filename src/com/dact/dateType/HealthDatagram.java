@@ -61,7 +61,7 @@ public class HealthDatagram {
 			// 备用短地址，不做任何操作
 		} else {// 其他短地址，即：节点的短地址
 			String longAddress = MapInfo.addressmap.get(shortAddress + " " + base.getIpaddress());
-			if ((longAddress.equals("007a410000000a7e")) || (longAddress.equals("e025000000417a00")) || (longAddress.equals("0326000000417a00"))) {
+			if ((longAddress.equals("007a410000000a7e")) || (longAddress.equals("e025000000417a00")) || (longAddress.equals("0326000000417a00")) || (longAddress.equals("d225000000417a00"))) {
 				longAddress = null;
 			}
 			if (longAddress != null) {// 长地址不为空
