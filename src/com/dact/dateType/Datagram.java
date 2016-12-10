@@ -64,46 +64,60 @@ public class Datagram {
 					// e.getMessage());
 					// }
 
-					String sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "_bt' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的表头值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.2：" + e.getMessage());
-					}
-					if (shuiInfo.equals("sia0001")) {
-						shuiliuliang += 42959;
-					} else if (shuiInfo.equals("sia0002")) {
-						shuiliuliang += 44165;
-					} else if (shuiInfo.equals("sia0003")) {
-						shuiliuliang += 1696.7;
-					} else if (shuiInfo.equals("sia0004")) {
-						shuiliuliang += 1821;
-					} else if (shuiInfo.equals("sia0005")) {
-						shuiliuliang += 357.6;
-					} else if (shuiInfo.equals("sia0006")) {
-						shuiliuliang += 3280;
-					} else if (shuiInfo.equals("sia0007")) {
-						shuiliuliang += 608;
-					}
-					sente = "with table1 as(select DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from [shui_opc] where typeserial = '" + shuiInfo + "') ";
-					sente += "update [shui_opc] set value = (select (" + shuiliuliang + "-table1.value)/table1.hours from table1)  where typeserial = '" + shuiInfo + "_0' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的瞬时值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.3：" + e.getMessage());
-					}
-					sente = "update [shui_opc] set value = " + shuiliuliang + ",reachtime = getdate() where typeserial = '" + shuiInfo + "' and tag = 0";
-					logWrite.write("更新当前数据库表shui_opc中的累计值：" + shuiInfo + "=" + shuiliuliang);
-					try {
-						logWrite.write("执行sql：" + sente);
-						dBtool.executeUpdate(sente);
-					} catch (SQLException e) {
-						logWrite.write("【 Error!】Datagram.excuteDatagram.4：" + e.getMessage());
-					}
+					// String sente = "update [shui_opc] set value = " +
+					// shuiliuliang + ",reachtime = getdate() where typeserial =
+					// '" + shuiInfo + "_bt' and tag = 0";
+					// logWrite.write("更新当前数据库表shui_opc中的表头值：" + shuiInfo + "="
+					// + shuiliuliang);
+					// try {
+					// logWrite.write("执行sql：" + sente);
+					// dBtool.executeUpdate(sente);
+					// } catch (SQLException e) {
+					// logWrite.write("【 Error!】Datagram.excuteDatagram.2：" +
+					// e.getMessage());
+					// }
+					// if (shuiInfo.equals("sia0001")) {
+					// shuiliuliang += 42959;
+					// } else if (shuiInfo.equals("sia0002")) {
+					// shuiliuliang += 44165;
+					// } else if (shuiInfo.equals("sia0003")) {
+					// shuiliuliang += 1696.7;
+					// } else if (shuiInfo.equals("sia0004")) {
+					// shuiliuliang += 1821;
+					// } else if (shuiInfo.equals("sia0005")) {
+					// shuiliuliang += 357.6;
+					// } else if (shuiInfo.equals("sia0006")) {
+					// shuiliuliang += 3280;
+					// } else if (shuiInfo.equals("sia0007")) {
+					// shuiliuliang += 608;
+					// }
+					// sente = "with table1 as(select
+					// DATEDIFF(HOUR,reachtime,GETDATE()) as hours,value from
+					// [shui_opc] where typeserial = '" + shuiInfo + "') ";
+					// sente += "update [shui_opc] set value = (select (" +
+					// shuiliuliang + "-table1.value)/table1.hours from table1)
+					// where typeserial = '" + shuiInfo + "_0' and tag = 0";
+					// logWrite.write("更新当前数据库表shui_opc中的瞬时值：" + shuiInfo + "="
+					// + shuiliuliang);
+					// try {
+					// logWrite.write("执行sql：" + sente);
+					// dBtool.executeUpdate(sente);
+					// } catch (SQLException e) {
+					// logWrite.write("【 Error!】Datagram.excuteDatagram.3：" +
+					// e.getMessage());
+					// }
+					// sente = "update [shui_opc] set value = " + shuiliuliang +
+					// ",reachtime = getdate() where typeserial = '" + shuiInfo
+					// + "' and tag = 0";
+					// logWrite.write("更新当前数据库表shui_opc中的累计值：" + shuiInfo + "="
+					// + shuiliuliang);
+					// try {
+					// logWrite.write("执行sql：" + sente);
+					// dBtool.executeUpdate(sente);
+					// } catch (SQLException e) {
+					// logWrite.write("【 Error!】Datagram.excuteDatagram.4：" +
+					// e.getMessage());
+					// }
 				}
 				/* 无线表 */
 				else {
@@ -145,13 +159,13 @@ public class Datagram {
 										// 不存
 									} else {
 									}
-									sente = "update [shui_opc] set value = " + tep_int + ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_" + (i - 2) + "'";
+									/*sente = "update [shui_opc] set value = " + tep_int + ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_" + (i - 2) + "'";
 									try {
 										logWrite.write("执行sql：" + sente);
 										dBtool.executeUpdate(sente);
 									} catch (SQLException e) {
 										logWrite.write("【 Error!】Datagram.excuteDatagram.7：" + e.getMessage());
-									}
+									}*/
 								}
 							}
 						}
