@@ -3,7 +3,6 @@ package com.dact.util;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
 
 public class RateUtil {
@@ -88,7 +87,8 @@ public class RateUtil {
 		}
 		int total = serial - begin + 1;
 		logWrite.write("总计，丢包个数为：" + lose_total);
-		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = " + rate + " %");
+		logWrite.write("成功率：(" + num + " / (" + serial + " - " + begin + " + 1)) * 100 = " + num + " / " + total + " = "
+				+ rate + " %");
 
 		updataRate(wia_longaddress, serial, rate, lose_total, logWrite);
 	}
@@ -110,7 +110,8 @@ public class RateUtil {
 			isnew = false;
 		}
 		if (isnew) {
-			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('" + wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
+			sql = "insert into  Adapter_server_final (longaddress,datagram_serial,dvalue,rate,reachtime) values ('"
+					+ wia_longaddress + "'," + serial + "," + lose + "," + rate + ",getdate())";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
@@ -118,7 +119,8 @@ public class RateUtil {
 				logWrite.write("【 Error!】Datagram.excuteDatagram.0：" + e.getMessage());
 			}
 		} else {
-			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = " + rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
+			sql = "update Adapter_server_final set datagram_serial = " + serial + ",dvalue = " + lose + ",rate = "
+					+ rate + " ,reachtime = getdate() where longaddress = '" + wia_longaddress + "'";
 			try {
 				logWrite.write("执行sql：" + sql);
 				dBtool.executeUpdate(sql);
