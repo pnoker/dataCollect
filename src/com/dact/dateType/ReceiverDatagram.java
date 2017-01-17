@@ -5,15 +5,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
@@ -102,7 +100,6 @@ public class ReceiverDatagram implements Runnable {
 		NetDatagram netDatagram = new NetDatagram();
 		HealthDatagram healthDatagram = new HealthDatagram();
 		Datagram datagram = new Datagram();
-		RateDatagram rateDatagram = new RateDatagram();
 		try {
 			datagramSocket.send(datagramSend);
 		} catch (IOException e) {
@@ -134,7 +131,6 @@ public class ReceiverDatagram implements Runnable {
 					case "0111":
 						logWrite.write("统计报文:" + hexDatagram);
 						logWrite.writeEasy("统计报文:", hexDatagram);
-						rateDatagram.excuteRateDatagram(p, base, logWrite);
 						break;
 					/* 节点测试信息 */
 					case "010f":

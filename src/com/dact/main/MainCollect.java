@@ -1,14 +1,11 @@
 package com.dact.main;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.dact.dateType.ReceiverDatagram;
 import com.dact.init.Initial;
 import com.dact.pojo.BaseInfo;
 import com.dact.util.OperateTxtUtil;
-import com.dact.util.RepairNumber;
 
 public class MainCollect {
 	public static void main(String[] args) {

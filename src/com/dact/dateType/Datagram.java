@@ -9,18 +9,18 @@ import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
-import com.dact.util.RateUtil;
 import com.dact.util.Sqlserver;
 
 public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		Sqlserver dBtool = new Sqlserver();
 		ResultSet rs = null;
-		RateUtil rateUtil = new RateUtil();
+		// RateUtil rateUtil = new RateUtil();
 		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, dltInfo, aiInfo, piInfo, hartaddress = "";
 		String[] infoArr, eachArr;
 		int interval = 0, serial;
-		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0, zerochannel = 0, onechannel = 0, pivalue;
+		float shuiliuliang, dianya, firstvalue, secondvalue, thirdvalue, fourthvalue = 0, zerochannel = 0,
+				onechannel = 0, pivalue;
 		Date lastime, currentime;
 		Date currentime_eight = new Date();
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd H:m:s");
@@ -54,12 +54,14 @@ public class Datagram {
 				/* 水表 */
 				if (deviceType.equals("0e00")) {
 					logWrite.write("该条数据为水表数据");
-					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
+					// rateUtil.rate(wia_shortaddress, wia_longaddress,
+					// base.getIpaddress(), serial, logWrite);
 
 					shuiInfo = MapInfo.shui_map.get(wia_longaddress);
 					shuiliuliang = p.bytesToFloatSmall(11, 14);
 					logWrite.write("水表数据：" + shuiInfo + "=" + shuiliuliang);
-					String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + shuiliuliang + ",getdate())";
+					String sente = "insert into [shui_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + shuiliuliang + ",getdate())";
 					logWrite.write("向数据库表shui_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
 					try {
 						logWrite.write("执行sql：" + sente);
@@ -79,7 +81,8 @@ public class Datagram {
 					wia_longaddress = wia_longaddress + " " + slaveID;
 					logWrite.write("从站地址：" + slaveID);
 					lastime = MapInfo.wirelessio_currentime.get(wia_longaddress);
-					rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
+					// rateUtil.rate(wia_shortaddress, wia_longaddress,
+					// base.getIpaddress(), serial, logWrite);
 
 					if (lastime != null) {
 						currentime = new Date();
@@ -94,23 +97,28 @@ public class Datagram {
 							for (int i = 2; i < infoArr.length; i++) {
 								eachArr = infoArr[i].split(" ");
 								if (eachArr[3].contains("int") && (p.bytesToString(13, 14).equals("8581"))) {
-									int tep_int = p.bytesToInt(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									int tep_int = p.bytesToInt(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_int + ",";
 									updatesente += tep_int;
 								} else if ((eachArr[3].contains("int")) && (p.bytesToString(13, 14).equals("0800"))) {
-									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
 								} else if (eachArr[3].contains("int")) {
-									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
 								} else if (eachArr[3].contains("float")) {
-									float tep_float = p.bytesToFloat3(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									float tep_float = p.bytesToFloat3(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
 								} else if (eachArr[3].contains("int01")) {
-									float tep_float = p.bytesToInt(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									float tep_float = p.bytesToInt(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
 								}
@@ -148,7 +156,8 @@ public class Datagram {
 						zerochannel = p.bytesToFloat3(12, 15);
 						onechannel = p.bytesToFloat3(17, 20);
 					}
-					String sente = "insert into [ai_data]values('" + aiInfo + "','" + zerochannel + "','" + onechannel + "',getdate())";
+					String sente = "insert into [ai_data]values('" + aiInfo + "','" + zerochannel + "','" + onechannel
+							+ "',getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
@@ -161,12 +170,12 @@ public class Datagram {
 			/* PI数据类型，04 */
 			else if (p.bytesToString(10, 10).equals("04")) {
 				logWrite.write("PI数据类型");
-				rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
+				// rateUtil.rate(wia_shortaddress, wia_longaddress,
+				// base.getIpaddress(), serial, logWrite);
 				lastime = MapInfo.pi_currentime.get(wia_longaddress);
 				if (lastime != null) {
 					currentime = new Date();
 					interval = getIntervalSeconds(lastime, currentime);
-					System.out.println("AI当前的时间间隔到底是什么" + interval);
 					if (interval > 30) {
 
 						piInfo = MapInfo.pi_map.get(wia_longaddress);
@@ -259,9 +268,13 @@ public class Datagram {
 					}
 
 					if (save) {
-						String sente = "insert into ele_data values('" + dltName + "'," + result + ",getdate(),'" + flagPart + "')";
-						String updatesente = "update [ele_opc] set value = " + result + ",reachtime = getdate() where typeserial = '" + dltName + "' and flag = '" + flagPart + "'";
-						String select_sente = "select  * from [anqingcollect].[dbo].[ele_opc] where typeserial = '" + dltName + "' and flag = '" + flagPart + "'";
+						String sente = "insert into ele_data values('" + dltName + "'," + result + ",getdate(),'"
+								+ flagPart + "')";
+						String updatesente = "update [ele_opc] set value = " + result
+								+ ",reachtime = getdate() where typeserial = '" + dltName + "' and flag = '" + flagPart
+								+ "'";
+						String select_sente = "select  * from [anqingcollect].[dbo].[ele_opc] where typeserial = '"
+								+ dltName + "' and flag = '" + flagPart + "'";
 						try {
 							rs = dBtool.executeQuery(select_sente);
 						} catch (SQLException e1) {
@@ -304,7 +317,8 @@ public class Datagram {
 		/* hart类型数据 */
 		else {
 			logWrite.write("hart类型数据");
-			rateUtil.rate(wia_shortaddress, wia_longaddress, base.getIpaddress(), serial, logWrite);
+			// rateUtil.rate(wia_shortaddress, wia_longaddress,
+			// base.getIpaddress(), serial, logWrite);
 			int i = 8;
 			int sure = 0;
 			boolean flag = true;
@@ -331,13 +345,16 @@ public class Datagram {
 						secondvalue = p.bytesToFloat3(sure + 20, sure + 23);
 						logWrite.write("第二变量值是：" + secondvalue);
 						if (infoArr[2].equals("false") && infoArr[3].equals("false")) {
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 						} else if (infoArr[2].equals("true") && infoArr[3].equals("false")) {
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',0,'" + firstvalue + "',getdate())";
 						} else if (infoArr[2].equals("true") && infoArr[3].equals("true")) {
 							fourthvalue = p.bytesToFloat3(sure + 30, sure + 33);
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',0,'" + firstvalue + "',getdate())";
 						}
 					}
 					try {
