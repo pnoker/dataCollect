@@ -143,11 +143,14 @@ public class Datagram {
 
 								eachArr = infoArr[i].split(" ");
 								if (eachArr[3].contains("long")) {
-									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]), Integer.parseInt(eachArr[2]));
+									long tep_int = p.bytesToLong(Integer.parseInt(eachArr[1]),
+											Integer.parseInt(eachArr[2]));
 									int tag = i - 2;
 									if (tag == 0) {
 										tep_int = (long) (tep_int * 0.0000001);
-										sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "'," + tag + "," + tep_int + ",getdate())";
+										sente = "insert into [" + infoArr[1]
+												+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',"
+												+ tag + "," + tep_int + ",getdate())";
 										try {
 											logWrite.write("执行sql：" + sente);
 											dBtool.executeUpdate(sente);
@@ -159,13 +162,17 @@ public class Datagram {
 										// 不存
 									} else {
 									}
-									/*sente = "update [shui_opc] set value = " + tep_int + ",reachtime = getdate() where typeserial =  '" + infoArr[0] + "_" + (i - 2) + "'";
-									try {
-										logWrite.write("执行sql：" + sente);
-										dBtool.executeUpdate(sente);
-									} catch (SQLException e) {
-										logWrite.write("【 Error!】Datagram.excuteDatagram.7：" + e.getMessage());
-									}*/
+									/*
+									 * sente = "update [shui_opc] set value = "
+									 * + tep_int +
+									 * ",reachtime = getdate() where typeserial =  '"
+									 * + infoArr[0] + "_" + (i - 2) + "'"; try {
+									 * logWrite.write("执行sql：" + sente);
+									 * dBtool.executeUpdate(sente); } catch
+									 * (SQLException e) { logWrite.write(
+									 * "【 Error!】Datagram.excuteDatagram.7：" +
+									 * e.getMessage()); }
+									 */
 								}
 							}
 						}
@@ -184,7 +191,8 @@ public class Datagram {
 					dianya = (float) dianya_tmp / 100;
 					logWrite.write("水表电压数据：" + shuiInfo + "=" + dianya);
 
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + dianya + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
@@ -202,7 +210,8 @@ public class Datagram {
 					dianya = (float) dianya_tmp / 100;
 					logWrite.write("通道0数据，温度数据：" + shuiInfo + "=" + tem1);
 					logWrite.write("通道1数据，温度数据：" + shuiInfo + "=" + tem2);
-					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo + "',0," + dianya + ",getdate())";
+					String sente = "insert into [dianya_data](typeserial,tag, value,reachtime)values('" + shuiInfo
+							+ "',0," + dianya + ",getdate())";
 					try {
 						logWrite.write("执行sql：" + sente);
 						dBtool.executeUpdate(sente);
@@ -284,7 +293,8 @@ public class Datagram {
 
 				String getdate = sdf.format(new Date());
 				String sente = "";
-				sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "'," + tag + "," + kairun + ",'" + getdate + "')";
+				sente = "insert into [kairun_data](typeserial,tag, value,reachtime)values('" + runInfo + "'," + tag
+						+ "," + kairun + ",'" + getdate + "')";
 				try {
 					logWrite.write("执行sql：" + sente);
 					dBtool.executeUpdate(sente);
@@ -292,7 +302,8 @@ public class Datagram {
 					logWrite.write("【 Error!】Datagram.excuteDatagram.9：" + e.getMessage());
 				}
 
-				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '" + runInfo + "_" + tag + "'";
+				sente = "update [shui_opc] set value = " + kairun + ",reachtime = getdate() where typeserial = '"
+						+ runInfo + "_" + tag + "'";
 				try {
 					logWrite.write("执行sql：" + sente);
 					dBtool.executeUpdate(sente);
@@ -340,14 +351,17 @@ public class Datagram {
 						secondvalue = p.bytesToFloat3(sure + 20, sure + 23);
 						logWrite.write("第二变量值是：" + secondvalue);
 						if (infoArr[2].equals("false") && infoArr[3].equals("false")) {
-							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.11：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -359,21 +373,25 @@ public class Datagram {
 
 						else if (infoArr[2].equals("true") && infoArr[3].equals("false")) {
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
-							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.13：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.14：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',2,'" + thirdvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',2,'" + thirdvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
@@ -386,28 +404,33 @@ public class Datagram {
 
 							thirdvalue = p.bytesToFloat3(sure + 25, sure + 28);
 							fourthvalue = p.bytesToFloat3(sure + 30, sure + 33);
-							String sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'" + firstvalue + "',getdate())";
+							String sente = "insert into [" + infoArr[1]
+									+ "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',0,'"
+									+ firstvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write("【 Error!】Datagram.excuteDatagram.16：" + e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',1,'" + secondvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',1,'" + secondvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write(e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',2," + thirdvalue + ",getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',2," + thirdvalue + ",getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
 							} catch (SQLException e) {
 								logWrite.write(e.getMessage());
 							}
-							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('" + infoArr[0] + "',3,'" + fourthvalue + "',getdate())";
+							sente = "insert into [" + infoArr[1] + "_data](typeserial,tag, value,reachtime) values('"
+									+ infoArr[0] + "',3,'" + fourthvalue + "',getdate())";
 							try {
 								logWrite.write("执行sql：" + sente);
 								dBtool.executeUpdate(sente);
