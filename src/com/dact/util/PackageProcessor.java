@@ -210,9 +210,10 @@ public class PackageProcessor {
 	}
 
 	public static void main(String[] args) {
-		byte[] test = { (byte) 0xc1, (byte) 0x01 , (byte) 0x97, (byte) 0x1f };
-		//byte[] test = { (byte) 0x4a, (byte) 0xbb , (byte) 0x00, (byte) 0x00 };
+		//byte[] test = { (byte) 0x03, (byte) 0x0c , (byte) 0x97, (byte) 0x1f };
+		byte[] test = { (byte) 0xde, (byte) 0x2 , (byte) 0x4a, (byte) 0x91 };
+		//byte[] test = { (byte) 0x4a, (byte) 0x91 , (byte) 0xde, (byte) 0x20 };
 		PackageProcessor p = new PackageProcessor(test);
-		System.out.println(p.bytesToIntMiddle(0, 3));
+		System.out.println(p.bytesToFloat(0, 3));
 	}
 }

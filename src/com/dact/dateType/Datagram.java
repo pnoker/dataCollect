@@ -88,8 +88,8 @@ public class Datagram {
 						currentime = new Date();
 						interval = getIntervalSeconds(lastime, currentime);
 
-						if (interval >= 0) {
-							System.out.println("3分钟才存储一个modbus数据");
+						if (interval >= 1800) {
+							System.out.println("30分钟才存储一个modbus数据");
 							MapInfo.wirelessio_currentime.put(wia_longaddress, currentime);
 							infoArr = MapInfo.wirelessio_map.get(wia_longaddress).split(",");
 							String sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0] + "',";
@@ -97,46 +97,124 @@ public class Datagram {
 							for (int i = 2; i < infoArr.length; i++) {
 								eachArr = infoArr[i].split(" ");
 								if (eachArr[3].contains("int") && (p.bytesToString(13, 14).equals("8581"))) {
-									System.out.println("8581");
 									int tep_int = p.bytesToInt(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_int + ",";
 									updatesente += tep_int;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
 								} else if ((eachArr[3].contains("int")) && (p.bytesToString(13, 14).equals("0800"))) {
-									System.out.println("0800");
 									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
+								} else if ((eachArr[3].contains("float")) && (p.bytesToString(13, 14).equals("010c"))) {
+									sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0].split("#")[0]
+											+ "',";
+									updatesente = "update [value_opc] set liuliang =";
+
+									float tep_float = p.bytesToFloat(Integer.parseInt(eachArr[1].split("#")[0]),
+											Integer.parseInt(eachArr[2].split("#")[0]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '"
+											+ infoArr[0].split("#")[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
+
+									sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0].split("#")[1]
+											+ "',";
+									updatesente = "update [value_opc] set liuliang =";
+
+									tep_float = p.bytesToFloat(Integer.parseInt(eachArr[1].split("#")[1]),
+											Integer.parseInt(eachArr[2].split("#")[1]));
+									sente = sente + "" + tep_float + ",";
+									updatesente += tep_float;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '"
+											+ infoArr[0].split("#")[1] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
+
 								} else if (eachArr[3].contains("int")) {
-									System.out.println("0000");
 									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
-									System.out.println(tep_float);
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
 								} else if (eachArr[3].contains("float")) {
 									float tep_float = p.bytesToFloat3(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
 								} else if (eachArr[3].contains("int01")) {
 									float tep_float = p.bytesToInt(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
+									sente = sente + "getdate())";
+									updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
+									try {
+										logWrite.write("执行sql：" + sente);
+										dBtool.executeUpdate(sente);
+										logWrite.write("执行sql：" + updatesente);
+										dBtool.executeUpdate(updatesente);
+									} catch (SQLException e) {
+										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
+									}
 								}
 							}
-							sente = sente + "getdate())";
-							updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
-							try {
-								logWrite.write("执行sql：" + sente);
-								dBtool.executeUpdate(sente);
-								logWrite.write("执行sql：" + updatesente);
-								dBtool.executeUpdate(updatesente);
-							} catch (SQLException e) {
-								logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
-							}
+
 						}
 
 					}
