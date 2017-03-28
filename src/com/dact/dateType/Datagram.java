@@ -15,7 +15,6 @@ public class Datagram {
 	public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
 		Sqlserver dBtool = new Sqlserver();
 		ResultSet rs = null;
-		// RateUtil rateUtil = new RateUtil();
 		String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, dltInfo, aiInfo, piInfo, hartaddress = "";
 		String[] infoArr, eachArr;
 		int interval = 0, serial;

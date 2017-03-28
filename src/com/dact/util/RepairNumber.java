@@ -28,7 +28,7 @@ public class RepairNumber {
 		DateUtil dateUtil = new DateUtil();
 		Map<String, String> config = null;
 		try {
-			config = ExcutePro.getP("config.properties");
+			config = ExcutePro.getProperties("config.properties");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -36,7 +36,8 @@ public class RepairNumber {
 		for (Entry<String, String> entry : config.entrySet()) {
 			String value = entry.getValue();
 			String[] temp = value.split("#");
-			sql = "select top(1) * from " + temp[0] + " where typeserial = '" + temp[1] + "' and tag = " + temp[2] + " order by reachtime desc";
+			sql = "select top(1) * from " + temp[0] + " where typeserial = '" + temp[1] + "' and tag = " + temp[2]
+					+ " order by reachtime desc";
 			rs = dBtool.executeQuery(sql);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String time = "";
@@ -51,7 +52,8 @@ public class RepairNumber {
 				if (intervel >= Long.parseLong(temp[3])) {
 					logWrite.write("发现数据丢包了 ");
 					date.setTime(date.getTime() + (1000 * Long.parseLong(temp[4])));
-					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1] + "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
+					sql = "insert into " + temp[0] + " (typeserial,tag,value,reachtime,isrepair) values ('" + temp[1]
+							+ "'," + temp[2] + "," + val + ",'" + sdf.format(date) + "',1)";
 					logWrite.write("填补数据: " + temp[1] + " , " + val + ", " + sdf.format(date));
 					dBtool2.executeUpdate(sql);
 					if (temp[1].contains("sia")) {
@@ -70,10 +72,12 @@ public class RepairNumber {
 						} else if (temp[1].equals("sia0007")) {
 							val += 608;
 						}
-						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "'";
+						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date)
+								+ "' where typeserial = '" + temp[1] + "'";
 						dBtool2.executeUpdate(sql);
 					} else if (temp[1].contains("wxio")) {
-						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date) + "' where typeserial = '" + temp[1] + "_" + temp[2] + "'";
+						sql = "update shui_opc set value = " + val + " ,reachtime = '" + sdf.format(date)
+								+ "' where typeserial = '" + temp[1] + "_" + temp[2] + "'";
 						dBtool2.executeUpdate(sql);
 					}
 

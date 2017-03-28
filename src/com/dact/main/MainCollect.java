@@ -1,29 +1,34 @@
 package com.dact.main;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.dact.dateType.ReceiverDatagram;
 import com.dact.init.Initial;
 import com.dact.pojo.BaseInfo;
-import com.dact.util.OperateTxtUtil;
+import com.dact.util.ExcutePro;
 
 public class MainCollect {
+	public static Map<String, String> gateWayList = new HashMap<String, String>();
+
 	public static void main(String[] args) {
-		System.out.println("<---初始化操作--->");
+		System.out.println("<---开启采数线程--->");
 		Initial initial = new Initial();
 		initial.init();
 
-		System.out.println("<---读取网关信息--->");
-		OperateTxtUtil readTxtUtil = new OperateTxtUtil();
-		ArrayList<String> gatewaylist = new ArrayList<String>();
-		gatewaylist = readTxtUtil.readLine("D:/sia/confiles/gatewayconf.txt");
+		try {
+			gateWayList = ExcutePro.getProperties("gateway.properties");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 
-		System.out.println("<---开启采数线程--->");
-		for (int m = 0; m < gatewaylist.size(); m++) {
+		/* 遍历map，获取网关和端口信息 */
+		for (Entry<String, String> entry : gateWayList.entrySet()) {
 			BaseInfo base = new BaseInfo();
-			base.setIpaddress(gatewaylist.get(m).split(",")[0]);// ipaddress
-			base.setPort(Integer.parseInt(gatewaylist.get(m).split(",")[1]));// port
-			base.setLocalport(Integer.parseInt(gatewaylist.get(m).split(",")[2]));// localport
+			base.setIpaddress(entry.getKey());// ipaddress
+			base.setPort(Integer.parseInt(entry.getValue().split("#")[0]));// port
+			base.setLocalport(Integer.parseInt(entry.getValue().split("#")[1]));// localport
 
 			ReceiverDatagram receiverDatagram = new ReceiverDatagram(base);
 			Thread thread = new Thread(receiverDatagram);

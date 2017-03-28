@@ -40,9 +40,9 @@ public class ReceiverDatagram implements Runnable {
 			this.datagramReceive = new DatagramPacket(buf, 1024);
 			this.logWrite = new LogWrite(base.getIpaddress());
 		} catch (SocketException e) {
-			logWrite.write("【 Error!】ReceiverDatagram。1" + e.getMessage());
+			logWrite.write( e.getMessage());
 		} catch (UnknownHostException e) {
-			logWrite.write("【 Error!】ReceiverDatagram.2" + e.getMessage());
+			logWrite.write( e.getMessage());
 		}
 	}
 
