@@ -95,7 +95,8 @@ public class PackageProcessor {
 	public float bytesToFloatSmall(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1], inpackage[startbit] };
+			byte[] s = { inpackage[startbit + 3], inpackage[startbit + 2], inpackage[startbit + 1],
+					inpackage[startbit] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -107,7 +108,8 @@ public class PackageProcessor {
 	public float bytesToFloat3(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2], inpackage[startbit + 3] };
+			byte[] s = { inpackage[startbit], inpackage[startbit + 1], inpackage[startbit + 2],
+					inpackage[startbit + 3] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -122,7 +124,8 @@ public class PackageProcessor {
 	public float bytesToFloatMiddle(int startbit, int endbit) {
 		float value = 0;
 		try {
-			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit], inpackage[startbit + 1] };
+			byte[] s = { inpackage[startbit + 2], inpackage[startbit + 3], inpackage[startbit],
+					inpackage[startbit + 1] };
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(s));
 			value = dis.readFloat();
 		} catch (IOException e) {
@@ -191,11 +194,11 @@ public class PackageProcessor {
 		for (int i = length; i >= 0; i--) {
 			valueOne ^= ((inpackage[start + length - i] << 8));
 			for (int n = 0; n < 8; n++) {
-				int  s= valueOne & ll;
+				int s = valueOne & ll;
 				if ((valueOne & ll) > 0) {
 					valueOne = ((valueOne << 1)) ^ valueCrc;
 				} else {
-					valueOne = (valueOne << 1) ;
+					valueOne = (valueOne << 1);
 				}
 			}
 		}
@@ -207,16 +210,9 @@ public class PackageProcessor {
 	}
 
 	public static void main(String[] args) {
-
-		byte[] test1 = { (byte) 0x01, (byte) 0x83, (byte) 0x0B, (byte) 0x00, (byte) 0x37, (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-				(byte) 0x86, (byte) 0x26, (byte) 0x06, (byte) 0xA2, (byte) 0x86, (byte) 0x36, (byte) 0x01, (byte) 0x07, (byte) 0x00, (byte) 0x48, (byte) 0x0C, (byte) 0x3F, (byte) 0xB5, (byte) 0x6A,
-				(byte) 0xD2, (byte) 0xC4, (byte) 0x1A, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xB3, (byte) 0xA7, (byte) 0x00, (byte) 0x00, (byte) 0x78, (byte) 0xDD };
-		PackageProcessor p1 = new PackageProcessor(test1);
-		//System.out.println(p1.WiaPaCRC(0, 36, 37));
-		//System.out.println(p1.bytesToInt(37, 38));
-		//System.out.println(p1.bytesToIntSmall(37, 38));
-		System.out.println("开始hart校验和：\n报文为：");
-		System.out.println("01830F0026A60000FFFFFFFF8605E3A2D288031A0010411CEDC24940 A17D4940A17D2B47C4A4482B47C436241D7800F4018554F4014F5C ");
-		System.out.println("\n结果：\ntrue");
+		byte[] test = { (byte) 0xc1, (byte) 0x01 , (byte) 0x97, (byte) 0x1f };
+		//byte[] test = { (byte) 0x4a, (byte) 0xbb , (byte) 0x00, (byte) 0x00 };
+		PackageProcessor p = new PackageProcessor(test);
+		System.out.println(p.bytesToIntMiddle(0, 3));
 	}
 }

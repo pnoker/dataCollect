@@ -88,7 +88,7 @@ public class Datagram {
 						currentime = new Date();
 						interval = getIntervalSeconds(lastime, currentime);
 
-						if (interval >= 1800) {
+						if (interval >= 0) {
 							System.out.println("3分钟才存储一个modbus数据");
 							MapInfo.wirelessio_currentime.put(wia_longaddress, currentime);
 							infoArr = MapInfo.wirelessio_map.get(wia_longaddress).split(",");
@@ -97,20 +97,24 @@ public class Datagram {
 							for (int i = 2; i < infoArr.length; i++) {
 								eachArr = infoArr[i].split(" ");
 								if (eachArr[3].contains("int") && (p.bytesToString(13, 14).equals("8581"))) {
+									System.out.println("8581");
 									int tep_int = p.bytesToInt(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_int + ",";
 									updatesente += tep_int;
 								} else if ((eachArr[3].contains("int")) && (p.bytesToString(13, 14).equals("0800"))) {
+									System.out.println("0800");
 									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
 								} else if (eachArr[3].contains("int")) {
+									System.out.println("0000");
 									float tep_float = p.bytesToIntMiddle(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
+									System.out.println(tep_float);
 								} else if (eachArr[3].contains("float")) {
 									float tep_float = p.bytesToFloat3(Integer.parseInt(eachArr[1]),
 											Integer.parseInt(eachArr[2]));
