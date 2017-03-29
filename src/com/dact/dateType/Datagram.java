@@ -72,7 +72,7 @@ public class Datagram {
 				}
 				/* 无线表 */
 				else {
-					logWrite.write("该条数据为modbus数据");
+					logWrite.write("这是一条无线IO数据");
 					String slaveID = null;
 					/* 从站地址 */
 					slaveID = p.bytesToString(11, 11);
@@ -88,7 +88,7 @@ public class Datagram {
 						interval = getIntervalSeconds(lastime, currentime);
 
 						if (interval >= 1800) {
-							System.out.println("30分钟才存储一个modbus数据");
+							logWrite.write("30分钟才存储一个modbus数据");
 							MapInfo.wirelessio_currentime.put(wia_longaddress, currentime);
 							infoArr = MapInfo.wirelessio_map.get(wia_longaddress).split(",");
 							String sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0] + "',";
@@ -125,12 +125,12 @@ public class Datagram {
 									} catch (SQLException e) {
 										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 									}
-								} else if ((eachArr[3].contains("float")) && (p.bytesToString(13, 14).equals("010c"))) {
-									sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0].split("#")[0]
+								} else if ((eachArr[3].contains("int")) && (p.bytesToString(13, 14).equals("000c"))) {
+									sente = "insert into [" + infoArr[1].split("#")[0] + "_data]values('" + infoArr[0].split("#")[0]
 											+ "',";
 									updatesente = "update [value_opc] set liuliang =";
 
-									float tep_float = p.bytesToFloat(Integer.parseInt(eachArr[1].split("#")[0]),
+									float tep_float = p.bytesToFloatMiddle(Integer.parseInt(eachArr[1].split("#")[0]),
 											Integer.parseInt(eachArr[2].split("#")[0]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;
@@ -146,11 +146,11 @@ public class Datagram {
 										logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
 									}
 
-									sente = "insert into [" + infoArr[1] + "_data]values('" + infoArr[0].split("#")[1]
+									sente = "insert into [" + infoArr[1].split("#")[1] + "_data]values('" + infoArr[0].split("#")[1]
 											+ "',";
 									updatesente = "update [value_opc] set liuliang =";
 
-									tep_float = p.bytesToFloat(Integer.parseInt(eachArr[1].split("#")[1]),
+									tep_float = p.bytesToFloatMiddle(Integer.parseInt(eachArr[1].split("#")[1]),
 											Integer.parseInt(eachArr[2].split("#")[1]));
 									sente = sente + "" + tep_float + ",";
 									updatesente += tep_float;

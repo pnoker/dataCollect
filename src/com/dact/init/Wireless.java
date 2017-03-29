@@ -31,30 +31,40 @@ public class Wireless {
 				Date date = cal.getTime();
 				MapInfo.wirelessio_currentime.put(lineArr[0], date);
 				tableArr = lineArr[1].split(",");
-				String sente = "create table " + tableArr[1] + "_data" + "(serial int identity(1,1), typeserial nvarchar(50) ,";
-				for (int i = 2; i < tableArr.length; i++) {
-					eachItem = tableArr[i].split(" ");
-					if (eachItem[3].contains("float")) {
-						sente = sente + "" + eachItem[0].substring(1, eachItem[0].length()) + " " + eachItem[3] + ",";
-					} else if (eachItem[3].contains("int")) {
-						sente = sente + "" + eachItem[0].substring(1, eachItem[0].length()) + " " + eachItem[3].substring(0, eachItem[3].length() - 1) + ",";
+				String[] tables = tableArr[1].split("#");
+				
+				for (int m = 0; m < tables.length; m++) {
+
+					String sente = "create table " + tables[m] + "_data"
+							+ "(serial int identity(1,1), typeserial nvarchar(50) ,";
+					for (int i = 2; i < tableArr.length; i++) {
+						eachItem = tableArr[i].split(" ");
+						if (eachItem[3].contains("float")) {
+							sente = sente + "" + eachItem[0].substring(1, eachItem[0].length()) + " " + eachItem[3]
+									+ ",";
+						} else if (eachItem[3].contains("int")) {
+							sente = sente + "" + eachItem[0].substring(1, eachItem[0].length()) + " "
+									+ eachItem[3].substring(0, eachItem[3].length() - 1) + ",";
+						}
 					}
-				}
-				sente = sente + "reachtime datetime)";
-				if (!tmp2.contains(tableArr[1] + "_data")) {
-					dbtool.executeUpdate(sente);
-					BufferedWriter fw = null;
-					try {
-						FileOutputStream fos = new FileOutputStream("D:\\sia\\confiles\\datatable.txt", true);
-						fw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-						fw.write(tableArr[1] + "_data");
-						fw.newLine();
-						fw.flush();
-						fw.close();
-					} catch (Exception e) {
-						e.printStackTrace();
+					sente = sente + "reachtime datetime)";
+
+					if (!tmp2.contains(tables[m] + "_data")) {
+						dbtool.executeUpdate(sente);
+						BufferedWriter fw = null;
+						try {
+							FileOutputStream fos = new FileOutputStream("D:\\sia\\confiles\\datatable.txt", true);
+							fw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+							fw.write(tables[m] + "_data");
+							fw.newLine();
+							fw.flush();
+							fw.close();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					} else {
 					}
-				} else {
+
 				}
 			}
 			bw.close();
