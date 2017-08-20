@@ -2,4 +2,3 @@ bin/
 .idea
 *.iml
 META-INF/
-!bin/artifacts/

@@ -6,10 +6,10 @@ import java.util.ArrayList;
 public class OperateTxtUtil {
     public ArrayList<String> readLine(String path) {
         ArrayList<String> line = new ArrayList<String>();
-        File file = new File(path);
         try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            FileInputStream fileInputStream = new FileInputStream(path);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String temp;
             while ((temp = bufferedReader.readLine()) != null) {
                 line.add(temp.trim());
@@ -35,25 +35,6 @@ public class OperateTxtUtil {
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (UnsupportedEncodingException e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void main(String[] args) {
-        ArrayList<String> line = new ArrayList<String>();
-        File file = new File("D:/sia/confiles/gatewayconf.txt");
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String temp;
-            while ((temp = bufferedReader.readLine()) != null) {
-                line.add(temp.trim());
-                System.out.println(temp.trim());
-            }
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
