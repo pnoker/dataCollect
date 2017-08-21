@@ -71,11 +71,4 @@ public class LogWrite {
             System.out.println(e.getMessage());
         }
     }
-
-    public static void main(String[] args) {
-        String detail = "01830b00cd450000740010";
-        String regex = "(.{2})";
-        detail = detail.replaceAll(regex, "$1 ");
-        System.out.println(detail);
-    }
 }

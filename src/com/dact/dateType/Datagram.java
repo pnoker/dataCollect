@@ -2,18 +2,22 @@ package com.dact.dateType;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
+import com.dact.pool.Pool;
 import com.dact.util.LogWrite;
 import com.dact.util.PackageProcessor;
-import com.dact.util.Sqlserver;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Datagram {
+    private Pool pool = Pool.getInstance("anqingcollect", "sa", "yangfan", "1433", "127.0.0.1", "sqlserver");
+
     public void excuteDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
-        Sqlserver dBtool = new Sqlserver();
+        Connection conn = pool.getConnection(10000);
         ResultSet rs = null;
         String wia_longaddress, wia_shortaddress, deviceType, shuiInfo, dltInfo, aiInfo, piInfo, hartaddress = "";
         String[] infoArr, eachArr;
@@ -48,9 +52,9 @@ public class Datagram {
 
 		/* 无线IO类型,7400 */
         if (p.bytesToString(8, 9).equals("7400")) {
-			/* modbus数据类型，01 */
+            /* modbus数据类型，01 */
             if (p.bytesToString(10, 10).equals("01")) {
-				/* 水表 */
+                /* 水表 */
                 if (deviceType.equals("0e00")) {
                     logWrite.write("该条数据为水表数据");
                     // rateUtil.rate(wia_shortaddress, wia_longaddress,
@@ -64,17 +68,18 @@ public class Datagram {
                     logWrite.write("向数据库表shui_data中添加一条数据：" + shuiInfo + "=" + shuiliuliang);
                     try {
                         logWrite.write("执行sql：" + sente);
-                        dBtool.executeUpdate(sente);
+                        Statement stmt = conn.createStatement();
+                        stmt.executeUpdate(sente);
                     } catch (SQLException e) {
                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                     }
 
                 }
-				/* 无线表 */
+                /* 无线表 */
                 else {
                     logWrite.write("这是一条无线IO数据");
                     String slaveID = null;
-					/* 从站地址 */
+                    /* 从站地址 */
                     slaveID = p.bytesToString(11, 11);
 
                     wia_longaddress = wia_longaddress + " " + slaveID;
@@ -104,9 +109,10 @@ public class Datagram {
                                     updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -119,9 +125,10 @@ public class Datagram {
                                     updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -139,9 +146,10 @@ public class Datagram {
                                             + infoArr[0].split("#")[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -159,9 +167,10 @@ public class Datagram {
                                             + infoArr[0].split("#")[1] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -175,9 +184,10 @@ public class Datagram {
                                     updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -190,9 +200,10 @@ public class Datagram {
                                     updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -205,9 +216,10 @@ public class Datagram {
                                     updatesente += ",reachtime = getdate() where typeserial = '" + infoArr[0] + "'";
                                     try {
                                         logWrite.write("执行sql：" + sente);
-                                        dBtool.executeUpdate(sente);
+                                        Statement stmt = conn.createStatement();
+                                        stmt.executeUpdate(sente);
                                         logWrite.write("执行sql：" + updatesente);
-                                        dBtool.executeUpdate(updatesente);
+                                        stmt.executeUpdate(updatesente);
                                     } catch (SQLException e) {
                                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                                     }
@@ -219,7 +231,7 @@ public class Datagram {
                     }
                 }
             }
-			/* AI数据类型，02 */
+            /* AI数据类型，02 */
             else if (p.bytesToString(10, 10).equals("02")) {
                 logWrite.write("AI数据类型");
                 lastime = MapInfo.ai_currentime.get(wia_longaddress);
@@ -241,14 +253,15 @@ public class Datagram {
                             + "',getdate())";
                     try {
                         logWrite.write("执行sql：" + sente);
-                        dBtool.executeUpdate(sente);
+                        Statement stmt = conn.createStatement();
+                        stmt.executeUpdate(sente);
                     } catch (SQLException e) {
                         logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                     }
 
                 }
             }
-			/* PI数据类型，04 */
+            /* PI数据类型，04 */
             else if (p.bytesToString(10, 10).equals("04")) {
                 logWrite.write("PI数据类型");
                 // rateUtil.rate(wia_shortaddress, wia_longaddress,
@@ -265,14 +278,15 @@ public class Datagram {
                         String sente = "insert into [pi_data]values('" + piInfo + "'," + pivalue + ",getdate())";
                         try {
                             logWrite.write("执行sql：" + sente);
-                            dBtool.executeUpdate(sente);
+                            Statement stmt = conn.createStatement();
+                            stmt.executeUpdate(sente);
                         } catch (SQLException e) {
                             logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                         }
                     }
                 }
             }
-			/* DLT数据类型 */
+            /* DLT数据类型 */
             else if (p.bytesToString(10, 10).equals("03")) {
                 logWrite.write("DLT数据类型 ");
 
@@ -357,7 +371,8 @@ public class Datagram {
                         String select_sente = "select  * from [anqingcollect].[dbo].[ele_opc] where typeserial = '"
                                 + dltName + "' and flag = '" + flagPart + "'";
                         try {
-                            rs = dBtool.executeQuery(select_sente);
+                            Statement stmt = conn.createStatement();
+                            rs = stmt.executeQuery(select_sente);
                         } catch (SQLException e1) {
                             e1.printStackTrace();
                         }
@@ -381,9 +396,10 @@ public class Datagram {
                             System.out.println("3分钟才存储一个电表数据");
                             try {
                                 logWrite.write("执行sql：" + sente);
-                                dBtool.executeUpdate(sente);
+                                Statement stmt = conn.createStatement();
+                                stmt.executeUpdate(sente);
                                 logWrite.write("执行sql：" + updatesente);
-                                dBtool.executeUpdate(updatesente);
+                                stmt.executeUpdate(updatesente);
                             } catch (SQLException e) {
                                 logWrite.write("【 Error!】Datagram.excuteDatagram.1：" + e.getMessage());
                             }
@@ -395,7 +411,7 @@ public class Datagram {
                 }
             }
         }
-		/* hart类型数据 */
+        /* hart类型数据 */
         else {
             logWrite.write("hart类型数据");
             // rateUtil.rate(wia_shortaddress, wia_longaddress,
@@ -440,7 +456,8 @@ public class Datagram {
                     }
                     try {
                         logWrite.write("执行sql：" + sente);
-                        dBtool.executeUpdate(sente);
+                        Statement stmt = conn.createStatement();
+                        stmt.executeUpdate(sente);
                     } catch (SQLException e) {
                         logWrite.write("【 Error!】Datagram.excuteDatagram.19：" + e.getMessage());
                     }
@@ -448,8 +465,8 @@ public class Datagram {
             }
         }
         try {
-            dBtool.free();
-        } catch (SQLException e) {
+            pool.freeConnection(conn);
+        } catch (Exception e) {
             logWrite.write("【 Error!】Datagram.excuteDatagram.23：" + e.getMessage());
         }
     }

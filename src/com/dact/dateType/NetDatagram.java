@@ -2,9 +2,12 @@ package com.dact.dateType;
 
 import com.dact.pojo.BaseInfo;
 import com.dact.pojo.MapInfo;
+import com.dact.pool.Pool;
 import com.dact.util.*;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -12,6 +15,9 @@ import java.util.ArrayList;
  * @Description 网络报文，更新拓扑图
  */
 public class NetDatagram {
+
+    private Pool pool = Pool.getInstance("anqingcollect", "sa", "yangfan", "1433", "127.0.0.1", "sqlserver");
+
     private String networkinfo = "";
 
     public String getNetworkinfo() {
@@ -44,9 +50,8 @@ public class NetDatagram {
      * 由于数据报文只有短地址，于是只能通过网络报文提供的对应关系确定设备
      */
     public void excuteNetDatagram(PackageProcessor p, BaseInfo base, String networkinfo, LogWrite logWrite) {
-        Sqlserver dBtool = new Sqlserver();
+        Connection conn = pool.getConnection(10000);
         PrintUtil printUtil = new PrintUtil();
-        DateUtil dateUtil = new DateUtil();
         String wia_longaddress = "", wia_shortaddress = "", deviceType = "";
         wia_longaddress = p.bytesToString(2, 9);
         wia_shortaddress = p.bytesToString(10, 11);
@@ -73,8 +78,9 @@ public class NetDatagram {
         try {
             logWrite.write("执行sql：" + sente);
             printUtil.printDetail(base.getIpaddress(), "执行sql：" + sente);
-            dBtool.executeUpdate(sente);
-            dBtool.free();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sente);
+            pool.freeConnection(conn);
         } catch (SQLException e) {
             logWrite.write("【 Error!】NetDatagram.excuteNetDatagram：" + e.getMessage());
         }

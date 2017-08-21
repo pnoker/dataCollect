@@ -17,12 +17,13 @@ public class HealthDatagram {
      *
      * @param p
      * @param base
+     * @param logWrite
      * @return updata, 是否更新健康报文时间戳，false：否，true：需要更新健康报文的时间戳
      */
     public boolean excuteHealthDatagram(PackageProcessor p, BaseInfo base, LogWrite logWrite) {
         boolean updata = false;
         String shortAddress = p.bytesToString(2, 3);
-        /* 短地址为0100，表示是该网关的健康报文 */
+        //短地址为0100，表示是该网关的健康报文
         if (shortAddress.equals("0100")) {
             MapInfo.gateway_currentime.put(base.getIpaddress(), (new Date()).getTime());
         } else if (shortAddress.equals("0000")) {
