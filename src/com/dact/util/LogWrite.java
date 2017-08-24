@@ -7,75 +7,69 @@ import java.io.OutputStreamWriter;
 import java.util.Date;
 
 public class LogWrite {
-	private BufferedWriter fw = null;
-	private BufferedWriter fwEasy = null;
-	private String path = "D:/dataCollect/SiaLog/";
-	private String pathEasy = "D:/dataCollect/Log/";
-	private String ipaddress;
-	private String fromIp;
-	private DateUtil date;
-	private PrintUtil printUtil;
+    private BufferedWriter siaWriter = null;
+    private BufferedWriter awWriter = null;
+    private String siaPath = "D:/RunProgramer/logs/dataCollect/siaLog/";
+    private String awPath = "D:/RunProgramer/logs/dataCollect/awLog/";
+    private String ipaddress;
+    private String fromIp;
 
-	public LogWrite(String ipaddress) {
-		printUtil = new PrintUtil();
-		this.ipaddress = ipaddress;
-		this.fromIp = ipaddress;
-		while (this.fromIp.length() < 15) {
-			this.fromIp += " ";
-		}
-		this.date = new DateUtil();
-		if (!(new File(path + ipaddress).isDirectory())) {
-			new File(path + ipaddress).mkdirs();
-		}
-		if (!(new File(pathEasy + ipaddress).isDirectory())) {
-			new File(pathEasy + ipaddress).mkdirs();
-		}
-	}
+    public LogWrite(String ipaddress) {
+        this.ipaddress = ipaddress;
+        this.fromIp = ipaddress;
+        while (this.fromIp.length() < 15) {
+            this.fromIp += " ";
+        }
+        if (!(new File(siaPath + ipaddress).isDirectory())) {
+            new File(siaPath + ipaddress).mkdirs();
+        }
+        if (!(new File(awPath + ipaddress).isDirectory())) {
+            new File(awPath + ipaddress).mkdirs();
+        }
+    }
 
-	public void write(String detail) {
-		DateUtil dateUtil = new DateUtil();
-		String file = path + ipaddress + "/" + dateUtil.getDayTime(new Date()) + ".txt";
-		try {
-			FileOutputStream fos = new FileOutputStream(file, true);
-			fw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-			fw.write(date.getCompleteTime(new Date()) + " " + fromIp + " --> " + detail);
-			printUtil.printDetail(fromIp, detail);
-			fw.newLine();
-			fw.flush();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
+    public void write(String detail) {
+        DateUtil dateUtil = new DateUtil();
+        String file = siaPath + ipaddress + "/" + dateUtil.getDayTime(new Date()) + ".log";
+        try {
+            FileOutputStream fos = new FileOutputStream(file, true);
+            siaWriter = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+            siaWriter.write(DateUtil.getCompleteTime(new Date()) + " " + fromIp + " --> " + detail);
+            PrintUtil.printDetail(fromIp, detail);
+            siaWriter.newLine();
+            siaWriter.flush();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-	public void writeEasy(String type, String detail) {
-		DateUtil dateUtil = new DateUtil();
-		String file = pathEasy + ipaddress + "/" + dateUtil.getDayTime(new Date()) + ".txt";
-		String regex = "(.{2})";
-		detail = detail.replaceAll(regex, "$1 ");
-		try {
-			FileOutputStream fos = new FileOutputStream(file, true);
-			fwEasy = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-			fwEasy.write(date.getCompleteTime(new Date()) + " " + fromIp + " --> " + type + detail);
-			fwEasy.newLine();
-			fwEasy.flush();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
+    public void writeEasy(String type, String detail) {
+        DateUtil dateUtil = new DateUtil();
+        String file = awPath + ipaddress + "/" + dateUtil.getDayTime(new Date()) + ".log";
+        String regex = "(.{2})";
+        detail = detail.replaceAll(regex, "$1 ");
+        try {
+            FileOutputStream fos = new FileOutputStream(file, true);
+            awWriter = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+            awWriter.write(DateUtil.getCompleteTime(new Date()) + " " + fromIp + " --> " + type + detail);
+            awWriter.newLine();
+            awWriter.flush();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-	public void close() {
+    public void close() {
+        try {
+            if (null != siaWriter) {
+                siaWriter.close();
+            }
+            if (null != awWriter) {
+                awWriter.close();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-		try {
-			fw.close();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-	public static void main(String[] args) {
-		String detail = "01830b00cd450000740010";
-		String regex = "(.{2})";
-		detail = detail.replaceAll(regex, "$1 ");
-		System.out.println(detail);
-	}
 }

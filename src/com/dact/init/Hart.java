@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.dact.pojo.MapInfo;
-import com.dact.util.Sqlserver;
+import com.dact.util.MySQLUtils;
 
 public class Hart {
 	public void init_hart() {
-		Sqlserver dbtool = new Sqlserver();
+		MySQLUtils dbtool = new MySQLUtils();
 		String[] tableArr = null;
 		ArrayList<String> tmp1 = (new DataTable()).init_datatable();
 		try {
