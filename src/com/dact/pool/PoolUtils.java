@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+/**
+ * @author Pnoker
+ * @description 线程池工具类
+ */
 public class PoolUtils {
     private int checkedOut;
     private Vector freeConnections = new Vector();
@@ -15,8 +19,14 @@ public class PoolUtils {
     private String password;
     private String url;
     private String user;
-    private static int num = 0;//空闲的连接数
-    private static int numActive = 0;//当前的连接数
+    /**
+     * 空闲的连接数
+     */
+    private static int num = 0;
+    /**
+     * 当前的连接数
+     */
+    private static int numActive = 0;
 
     public PoolUtils(String password, String url, String user, int normalConn, int maxConn) {
         this.password = password;
@@ -25,7 +35,8 @@ public class PoolUtils {
         this.maxConn = maxConn;
         this.normalConn = normalConn;
 
-        for (int i = 0; i < normalConn; i++) { //初始normalConn个连接
+        //初始normalConn个连接
+        for (int i = 0; i < normalConn; i++) {
             Connection c = newConnection();
             if (c != null) {
                 freeConnections.addElement(c);
@@ -34,7 +45,11 @@ public class PoolUtils {
         }
     }
 
-    //释放不用的连接到连接池
+    /**
+     * 释放不用的连接到连接池
+     *
+     * @param con
+     */
     public synchronized void freeConnection(Connection con) {
         freeConnections.addElement(con);
         num++;
@@ -43,55 +58,62 @@ public class PoolUtils {
         notifyAll();
     }
 
-    //获取一个可用连接
+    /**
+     * 获取一个可用连接
+     *
+     * @return
+     */
     public synchronized Connection getConnection() {
         Connection con = null;
-
-        if (freeConnections.size() > 0) { //还有空闲的连接
+        //还有空闲的连接
+        if (freeConnections.size() > 0) {
             num--;
-
             con = (Connection) freeConnections.firstElement();
             freeConnections.removeElementAt(0);
             try {
                 if (con.isClosed()) {
-                    System.out.println("从连接池删除一个无效连接");
                     con = getConnection();
                 }
             } catch (SQLException e) {
-                System.out.println("从连接池删除一个无效连接");
                 con = getConnection();
             }
-        } else if (maxConn == 0 || checkedOut < maxConn) { //没有空闲连接且当前连接小于最大允许值,最大值为0则不限制
+            //没有空闲连接且当前连接小于最大允许值,最大值为0则不限制
+        } else if (maxConn == 0 || checkedOut < maxConn) {
             con = newConnection();
         }
-
-        if (con != null) { //当前连接数加1
+        //当前连接数加1
+        if (con != null) {
             checkedOut++;
         }
-
         numActive++;
         return con;
     }
 
-    //获取一个连接,并加上等待时间限制,时间为毫秒
+    /**
+     * 获取一个连接,并加上等待时间限制,时间为毫秒
+     *
+     * @param timeout
+     * @return
+     */
     public synchronized Connection getConnection(long timeout) {
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         Connection con;
         while ((con = getConnection()) == null) {
-
             try {
                 wait(timeout);
             } catch (InterruptedException e) {
             }
-
-            if ((new Date().getTime() - startTime) >= timeout) {
-                return null; //超时返回
+            if ((System.currentTimeMillis() - startTime) >= timeout) {
+                //超时返回
+                return null;
             }
         }
         return con;
     }
 
-    //关闭所有连接
+    /**
+     * 关闭所有连接
+     */
     public synchronized void release() {
         Enumeration allConnections = freeConnections.elements();
         while (allConnections.hasMoreElements()) {
@@ -100,37 +122,47 @@ public class PoolUtils {
                 con.close();
                 num--;
             } catch (SQLException e) {
-                System.out.println("无法关闭连接池中的连接");
             }
         }
         freeConnections.removeAllElements();
         numActive = 0;
     }
 
-    //创建一个新连接
+    /**
+     * 创建一个新连接
+     *
+     * @return
+     */
     private Connection newConnection() {
         Connection con = null;
         try {
-            if (user == null) { //用户,密码都为空
+            //用户,密码都为空
+            if (user == null) {
                 con = DriverManager.getConnection(url);
             } else {
                 con = DriverManager.getConnection(url, user, password);
             }
-            System.out.println("连接池创建一个新的连接");
         } catch (SQLException e) {
-            System.out.println("无法创建这个URL的连接" + url);
             return null;
         }
         return con;
     }
 
-    //返回当前空闲连接数
-    public int getnum() {
+    /**
+     * 返回当前空闲连接数
+     *
+     * @return
+     */
+    public int getNum() {
         return num;
     }
 
-    //返回当前连接数
-    public int getnumActive() {
+    /**
+     * 返回当前连接数
+     *
+     * @return
+     */
+    public int getNumActive() {
         return numActive;
     }
 }

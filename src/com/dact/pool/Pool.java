@@ -97,13 +97,13 @@ public class Pool {
 
     //返回当前空闲连接数
     public int getnum() {
-        return pool.getnum();
+        return pool.getNum();
     }
 
 
     //返回当前连接数
     public int getnumActive() {
-        return pool.getnumActive();
+        return pool.getNumActive();
     }
 
 
